@@ -1,11 +1,22 @@
+import { Link, Route, Routes } from 'react-router-dom'
 import './App.css'
+import HomePage from './pages/Home/HomePage'
+import SchedulePage from './pages/Schedule/SchedulePage'
 
 function App() {
 
   return (
-    <>
-     
-    </>
+    <div>
+      <nav>
+        <Link to="/">홈</Link>
+        <Link to="/schedule">일정 페이지</Link>
+      </nav>
+
+      <Routes>
+        <Route path="/" element={<HomePage/>}/>
+        <Route path="/schedule" element={<SchedulePage/>}/>
+      </Routes>
+    </div>
   )
 }
 
