@@ -1,14 +1,22 @@
 import type { Schedule } from "../types/exam";
 
-const BASE_URL="http://localhost:8080"; //백엔드 주소
+type OkResponse<T> = {
+  success: boolean;
+  data: T;
+  path: string;
+};
 
-export async function getSchedules(): Promise<Schedule[]>{
-    const response=await fetch(`${BASE_URL}/api/calendar`);
+const BASE_URL = "http://localhost:8080";
 
-    if(!response.ok){
-        throw new Error("일정 데이터를 불러오지 못했습니다.");
-    }
+export async function getSchedules(year: number, month: number): Promise<Schedule[]> {
+  const res = await fetch(`${BASE_URL}/api/calendar?year=${year}&month=${month}`);
 
-    const data=await response.json();
-    return data;
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error("에러 응답:", errorText);
+    throw new Error("일정 데이터를 불러오지 못했습니다.");
+  }
+
+  const result: OkResponse<Schedule[]> = await res.json();
+  return result.data;
 }
