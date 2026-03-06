@@ -13,8 +13,8 @@ export type Schedule = {
   scheduleId: number;
   certificateName: number;
   examName: string;
-  examType: string;
-  eventType: string;
+  examType: string; //실기, 필기
+  eventType: string; //지원일, 시험일, 결과일
   startDate: string;
   endDate: string;
 };
