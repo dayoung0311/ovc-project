@@ -1,14 +1,14 @@
 import { Route, Routes } from 'react-router-dom'
-import './App.css'
+import styles from './App.module.css'
 import HomePage from './pages/Home/HomePage'
 import SchedulePage from './pages/Calendar/CalendarPage'
-import Header from './components/layout/Header'
+import Header from './components/layout/Header/Header'
 
 function App() {
 
   return (
     <div>
-      <div className="header">
+      <div className={styles.header}>
       <Header/>
       </div>
 
