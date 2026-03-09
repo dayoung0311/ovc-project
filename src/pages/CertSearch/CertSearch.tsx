@@ -5,6 +5,7 @@ import SearchListCard from "../../components/common/cards/SearchListCard"
 
 function CertSearch() {
     const [viewType, setViewType] = useState("grid");
+    const [search, setSearch]=useState("");
 
     return (
         <div className="flex flex-row">
@@ -55,6 +56,15 @@ function CertSearch() {
                         </button>
                     </div>
                 </div>
+                <div className="flex w-full border border-black-200 justify-between px-6 py-5 rounded-xl mb-[16px]">
+                            <input
+                            type="text"
+                            placeholder="자격증 검색..."
+                            value={search}
+                            onChange={(e)=>setSearch(e.target.value)}
+                          />
+                            <button>검색</button>
+                        </div>
 
                 {viewType === "grid" && (
                     <SearchGridCard
