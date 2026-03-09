@@ -3,7 +3,7 @@ import styles from './Footer.module.css'
 function Footer(){
     return(
         <div className={styles.footer}>
-            푸터
+            <p className={styles.content}>Copyright ©️ One View Cert. All Rights Reserved.</p>
         </div>
     )
 }
