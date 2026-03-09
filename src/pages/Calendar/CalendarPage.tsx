@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { Schedule } from "../../types/exam";
 import { getSchedules } from "../../api/schedule";
 import { mapSchedulesToEvents } from "../../utils/calendar";
-import styles from './CalendarPage.module.css'
+import './calendar.css'
 
 function CalendarPage() {
     const [schedules, setSchedules] = useState<Schedule[]>([]);
@@ -38,13 +38,25 @@ function CalendarPage() {
     if (error) return <div>{error}</div>
 
     return (
-        <div className={styles.container}>
-            <FullCalendar
-                plugins={[dayGridPlugin]}
-                initialView="dayGridMonth"
-                events={events}
-                height="auto"
-            />
+        <div className="flex">
+            {/* 좌측 - 캘린더  */}
+            <div className="flex-1 p-[40px]">
+                <FullCalendar
+                    plugins={[dayGridPlugin]}
+                    initialView="dayGridMonth"
+                    events={events}
+                    height="auto"
+                    headerToolbar={{
+                        left: "",
+                        center: "prev title next",
+                        right: "today"
+                    }}
+                />
+            </div>
+            {/* 우측 - 자격증 상세정보 */}
+            <div className="w-[400px] h-screen bg-green-100">
+                <p>상세정보를 표시하는 영역입니다.</p>
+            </div>
         </div>
     )
 }
