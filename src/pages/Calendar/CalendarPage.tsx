@@ -4,11 +4,17 @@ import { useEffect, useState } from "react";
 import type { CalendarEventType, Schedule } from "../../types/exam";
 import { getSchedules } from "../../api/schedule";
 import { mapSchedulesToEvents } from "../../utils/calendar";
+import type { EventApi } from "@fullcalendar/core";
 import './calendar.css'
 
 function CalendarPage() {
     const [schedules, setSchedules] = useState<Schedule[]>([]); //API에서 받은 일정 데이터 저장
     const [events, setEvents] = useState<CalendarEventType[]>([]); //캘린더에 표시할 이벤트
+    //일정 클릭 시에만 우측 상세정보 바가 나타나도록 제어하기 위한 state
+    //FullCalendar Event타입은 EventApi
+    const [selectedEvent, setSelectedEvent] = useState<EventApi | null>(null);
+    //클릭한 일정의 상세정보를 담는 state
+    const [selectedSchedule, setSelectedSchedule] = useState<CalendarEventType["extendedProps"] | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -67,6 +73,20 @@ function CalendarPage() {
                         }
                     }}
 
+                    eventClick={(info) => {
+                        const props = info.event.extendedProps;
+
+                        setSelectedSchedule({
+                            scheduleId: props.scheduleId,
+                            certificateName: props.certificateName,
+                            examType: props.examType,
+                            eventType: props.eventType,
+                            startDate: props.startDate,
+                            endDate: props.endDate
+                        });
+                        setSelectedEvent(info.event);
+                    }}
+
                     eventClassNames={(arg) => {
                         const type = arg.event.extendedProps.eventType;
 
@@ -94,9 +114,23 @@ function CalendarPage() {
                 />
             </div>
             {/* 우측 - 자격증 상세정보 */}
-            <div className="w-[400px] h-screen bg-green-100">
-                <p>상세정보를 표시하는 영역입니다.</p>
-            </div>
+            {selectedEvent && (
+                <div className="flex w-[400px] h-screen bg-green-100">
+                    <div>
+                  {selectedSchedule ? (
+                    <div>
+                    <h1>{selectedSchedule.certificateName}</h1>
+                    <p>시험 종류 : {selectedSchedule.examType}</p>
+                    <p>일정 유형: {selectedSchedule.eventType}</p>
+                    <p>기간: {selectedSchedule.startDate.slice(0,10)} ~ {selectedSchedule.endDate.slice(0,10)}</p>
+                    </div>
+                  ):(<p>일정을 선택하세요.</p>)}
+              </div>
+              <div>
+                    <button onClick={() => setSelectedEvent(null)}>X</button>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
