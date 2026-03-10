@@ -6,10 +6,8 @@ interface SearchListCardProps {
 function SearchListCard({ title, description }: SearchListCardProps) {
     return (
         <div className="w-full flex bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition overflow-hidden">
-
-
             {/* 좌측 영역 */}
-            <div className="flex pt-10 mr-auto">
+            <div className="flex mr-auto items-center">
                 <div className="pl-6 flex items-start justify-between">
                     <div className="w-18 h-18 bg-gray-200 rounded-lg flex items-center justify-center text-xs font-bold">
                         CISSP
