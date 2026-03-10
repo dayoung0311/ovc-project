@@ -12,7 +12,7 @@ export const getCerts = async (
     categoryIds,
     keyword = "",
     page = 0,
-    size = 6,
+    size = 10,
     sort = "name,ASC",
   } = params;
 

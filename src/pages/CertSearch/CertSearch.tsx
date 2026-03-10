@@ -4,8 +4,13 @@ import SearchListCard from "../../components/common/cards/SearchListCard";
 import { Search } from "lucide-react";
 import { useCertSearch } from "../../hooks/useCertSearch";
 import { useCategory } from "../../hooks/useCategory";
+import Modal from "../../components/common/modal/Modal";
 
 function CertSearch() {
+  //모달이 열렸다.닫혔다
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [page, setPage] = useState(0);
   const [viewType, setViewType] = useState("grid");
 
   //입력 중인 값(검색창에 입력한 값)(단순입력)
@@ -19,8 +24,8 @@ function CertSearch() {
   const { data, isLoading, isError } = useCertSearch({
     keyword, //검색어
     categoryIds, //카테고리 ids
-    page: 0, //1페이지
-    size: 6, //한페이지에 6개
+    page, //1페이지
+    size: 10, //한페이지에 10개
     sort: "name,ASC", //이름을 기준으로 오름차순
   });
 
@@ -35,10 +40,13 @@ function CertSearch() {
   } = useCategory();
 
   const categories = categoryData?.data ?? [];
-  const getCategoryName = (categoryId: number) => {
-    return categories.find((category) => category.id === categoryId)?.name ?? "";
-  };
 
+  //카테고리 id를 이용해서 카테고리 이름을 찾아오는 함수
+  const getCategoryName = (categoryId: number) => {
+    return (
+      categories.find((category) => category.id === categoryId)?.name ?? ""
+    );
+  };
 
   const handleCategoryChange = (categoryId: number) => {
     setSelectedCategories((prev) =>
@@ -52,11 +60,33 @@ function CertSearch() {
   const handleSearch = () => {
     setKeyword(searchInput);
     setCategoryIds(selectedCategories);
+    setPage(0); //검색 조건 바뀌면 페이지는 1페이지로
   };
-  console.log("categories", categories);
-console.log("certs", certs);
-console.log(categories.map((c) => c.id));
-console.log(certs.map((c) => c.certId));
+
+  const totalPages = data?.data.totalPages ?? 0;
+  const currentPage = data?.data.currentPage ?? 0;
+  const isFirst = data?.data.isFirst ?? true;
+  const isLast = data?.data.isLast ?? true;
+
+  //totalPages = 5일 때
+  //pageNumbers = [0,1,2,3,4]
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i);
+
+  const handlePrevPage = () => {
+    if (!isFirst) {
+      setPage((prev) => prev - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (!isLast) {
+      setPage((prev) => prev + 1);
+    }
+  };
+
+  const handlePageClick = (pageNumber: number) => {
+    setPage(pageNumber);
+  };
 
   return (
     <div className="flex flex-row">
@@ -145,7 +175,7 @@ console.log(certs.map((c) => c.certId));
           <div className="flex flex-wrap gap-x-6 gap-y-6 w-full">
             {certs.map((item) => {
               return (
-                <div key={item.certId}>
+                <div key={item.certId} onClick={() => setIsModalOpen(true)}>
                   <SearchGridCard
                     title={item.name}
                     category={getCategoryName(item.categoryId)}
@@ -169,6 +199,7 @@ console.log(certs.map((c) => c.certId));
                   key={item.certId}
                   //리스트의 마지막
                   className={`p-2 ${!isLast ? "border-b border-gray-200" : ""}`}
+                  onClick={() => setIsModalOpen(true)}
                 >
                   <SearchListCard
                     title={item.name}
@@ -180,7 +211,46 @@ console.log(certs.map((c) => c.certId));
             })}
           </div>
         )}
+
+        {totalPages > 1 && (
+          <div contextMenu="flex justify-center items-center gap-2 mt-8">
+            <button
+              onClick={handlePrevPage}
+              disabled={isFirst}
+              className="px-3 py-2 border rounded disabled:opacity-40"
+            >
+              이전
+            </button>
+            {pageNumbers.map((pageNumber) => (
+              <button
+                key={pageNumber}
+                onClick={() => handlePageClick(pageNumber)}
+                className={`px-3 py-2 border rounded ${
+                  currentPage === pageNumber
+                    ? "bg-black text-white"
+                    : "bg-white"
+                }`}
+              >
+                {pageNumber + 1}
+              </button>
+            ))}
+            <button
+              onClick={handleNextPage}
+              disabled={isLast}
+              className="px-3 py-2 border rounded disabled:opacity-40"
+            >
+              다음
+            </button>
+          </div>
+        )}
       </div>
+      <Modal
+        isOpen={isModalOpen}
+        title="자격증 등록"
+        onClose={() => setIsModalOpen(false)}
+      >
+        <p>ㅏ하하하하하하</p>
+      </Modal>
     </div>
   );
 }
