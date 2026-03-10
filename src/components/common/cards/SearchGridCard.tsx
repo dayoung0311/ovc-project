@@ -1,6 +1,6 @@
 interface SearchGridCardProps {
   title: string;
-  category: number;
+  category: string;
   description: string;
 }
 
