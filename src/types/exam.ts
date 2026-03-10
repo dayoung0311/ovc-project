@@ -24,6 +24,7 @@ export type CalendarEventType = {
   title: string;
   start: string;
   end: string;
+  allDay: boolean; 
   extendedProps: {
     scheduleId: number;
     certificateName: string;

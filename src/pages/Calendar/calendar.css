@@ -71,7 +71,7 @@
 .fc-day-today {
   background: #ecfdf5 !important;
 }
-
+/* 
 /* 이벤트 카드 */
 .fc-event {
   border: none;
@@ -79,7 +79,7 @@
   padding: 2px 4px;
   font-size: 12px;
   background-color: #22c55e;
-}
+} */
 
 /* 이벤트 hover */
 .fc-event:hover {
