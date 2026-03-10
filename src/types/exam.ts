@@ -20,15 +20,18 @@ export type Schedule = {
 };
 
 export type CalendarEventType = {
-  id: string;
+  id: number;
   title: string;
-  date: string;
-  extendedProps: {
-    scheduleId: number;
-    certId: number;
-    examType: string;
-    applyStartAt: string;
-    applyEndAt: string;
-    // resultAt: string;
-  };
+  start: string;
+  end: string;
+  extended:extendedProps
 };
+
+export type extendedProps = {
+  scheduleId: number;
+    certificationName: string;
+    examType: string;
+    eventType: string;
+    startDate: string;
+    endDate: string;
+}

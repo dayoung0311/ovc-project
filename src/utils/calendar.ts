@@ -4,6 +4,7 @@ export function mapSchedulesToEvents(schedules: Schedule[]) {
   return schedules.map((schedule) => ({
     id: String(schedule.scheduleId),
     title: schedule.examName,
-    date: schedule.startDate.slice(0, 10),
+    start: schedule.startDate,
+    end: schedule.endDate,
   }));
 }
