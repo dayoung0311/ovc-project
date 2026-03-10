@@ -2,76 +2,57 @@ import { useState } from "react";
 import SearchGridCard from "../../components/common/cards/SearchGridCard";
 import SearchListCard from "../../components/common/cards/SearchListCard";
 import { Search } from "lucide-react";
-
-type Item = {
-  id: number;
-  title: string;
-  category: string;
-  description: string;
-};
-
-const items: Item[] = [
-  {
-    id: 1,
-    title: "AWS Certified Solutions Architect",
-    category: "IT/기술",
-    description: "AWS 기술을 활용한 클라우드 설계 자격증",
-  },
-  {
-    id: 2,
-    title: "CISSP",
-    category: "경영/비즈니스",
-    description: "보안 관리자 및 엔지니어를 위한 자격증",
-  },
-  {
-    id: 3,
-    title: "Google Associate Cloud Engineer",
-    category: "금융/회계",
-    description: "GCP 환경에서 인프라를 관리하는 기본 능력 평가",
-  },
-];
-
-const categories = ["IT/기술", "경영/비즈니스", "금융/회계", "외국어"];
+import { useCertSearch } from "../../hooks/useCertSearch";
 
 function CertSearch() {
   const [viewType, setViewType] = useState("grid");
 
   //입력 중인 값(검색창에 입력한 값)(단순입력)
   const [searchInput, setSearchInput] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
 
   //실제 검색에 적용된 값(엔터를 눌렀을 경우나 검색버튼을 클릭했을때 적용되는 값)
-  const [appliedSearch, setAppliedSearch] = useState("");
-  const [appliedCategories, setAppliedCategories] = useState<string[]>([]);
+  const [keyword, setKeyword] = useState("");
+  const [categoryIds, setCategoryIds] = useState<number[]>([]);
 
-  const handleCategoryChange = (category: string) => {
+  const { data, isLoading, isError } = useCertSearch({
+    keyword,
+    categoryIds,
+    page: 0,
+    size: 6,
+    sort: "name,ASC",
+  });
+
+  const certs = data?.data.content ?? [];
+
+  const handleCategoryChange = (categoryId: number) => {
     setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((item) => item !== category)
-        : [...prev, category],
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId],
     );
   };
 
   //input에 입력했던것으로 검색에 적용할 겁니다.
   const handleSearch = () => {
-    setAppliedSearch(searchInput);
-    setAppliedCategories(selectedCategories);
+    setKeyword(searchInput);
+    setCategoryIds(selectedCategories);
   };
 
-  //카테고리를 하나도 안 체크하면 전체 허용
-  //체크된 카테고리가 있으면 해당 카테고리만 허용
-  const filteredItems = items.filter((item) => {
-    const matchesCategory =
-      appliedCategories.length === 0 ||
-      appliedCategories.includes(item.category);
+  //   //카테고리를 하나도 안 체크하면 전체 허용
+  //   //체크된 카테고리가 있으면 해당 카테고리만 허용
+  //   const filteredItems = items.filter((item) => {
+  //     const matchesCategory =
+  //       appliedCategories.length === 0 ||
+  //       appliedCategories.includes(item.category);
 
-    //검색어는 제목 | 설명으로도 검색가능
-    const matchesSearch =
-      item.title.toLowerCase().includes(appliedSearch.toLowerCase()) ||
-      item.description.toLowerCase().includes(appliedSearch.toLowerCase());
+  //     //검색어는 제목 | 설명으로도 검색가능
+  //     const matchesSearch =
+  //       item.title.toLowerCase().includes(appliedSearch.toLowerCase()) ||
+  //       item.description.toLowerCase().includes(appliedSearch.toLowerCase());
 
-    return matchesCategory && matchesSearch;
-  });
+  //     return matchesCategory && matchesSearch;
+  //   });
 
   return (
     <div className="flex flex-row">
@@ -79,20 +60,32 @@ function CertSearch() {
       <div className="w-[320px] h-screen p-[50px] bg-green-100">
         <h3 className="font-medium text-lg mb-6">카테고리</h3>
         <div className="space-y-4">
-          {categories.map((category) => (
-            <label
-              key={category}
-              className="flex items-center gap-3 cursor-pointer"
-            >
-              <input
-                type="checkbox"
-                className="w-5 h-5 accent-green-600"
-                checked={selectedCategories.includes(category)}
-                onChange={() => handleCategoryChange(category)}
-              />
-              <span className="text-gray-700 font-medium">{category}</span>
-            </label>
-          ))}
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={selectedCategories.includes(1)}
+              onChange={() => handleCategoryChange(1)}
+            />
+            <span>IT/기술</span>
+          </label>
+
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={selectedCategories.includes(2)}
+              onChange={() => handleCategoryChange(2)}
+            />
+            <span>경영/비즈니스</span>
+          </label>
+
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={selectedCategories.includes(3)}
+              onChange={() => handleCategoryChange(3)}
+            />
+            <span>금융/회계</span>
+          </label>
         </div>
       </div>
       {/* 우측 - 카드 영역 */}
@@ -144,23 +137,24 @@ function CertSearch() {
           </button>
         </div>
 
-        {/* 필터된 애가 없으면 */}
-        {filteredItems.length === 0 && (
+        {isLoading && <div>불러오는 중...</div>}
+        {isError && <div>데이터를 불러오지 못했습니다.</div>}
+        {!isLoading && !isError && certs.length === 0 && (
           <div className="py-10 text-center text-gray-500">
             조건에 맞는 자격증이 없습니다.
           </div>
         )}
 
-        {/* 필터아이템의 길이가 0보다 클때 그리드화 */}
-        {viewType === "grid" && filteredItems.length > 0 && (
+
+        {viewType === "grid" && (
           <div className="flex flex-wrap gap-x-6 gap-y-6 w-full">
-            {filteredItems.map((item) => {
+            {certs.map((item) => {
               return (
-                <div key={item.id}>
+                <div key={item.certId}>
                   <SearchGridCard
-                    title={item.title}
-                    category={item.category}
-                    description={item.description}
+                    title={item.name}
+                    category={String(item.categoryId)}
+                    description={item.description ?? ""}
                   />
                 </div>
               );
@@ -169,22 +163,22 @@ function CertSearch() {
         )}
 
         {/* 필터아이템의 길이가 0보다 클때 리스트화 */}
-        {viewType === "list" && filteredItems.length > 0 && (
+        {viewType === "list" && (
           <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white">
-            {filteredItems.map((item, index) => {
-              const isLast = index === filteredItems.length - 1;
+            {certs.map((item, index) => {
+              const isLast = index === certs.length - 1;
 
               return (
                 // 리스트를 감싸는 div
                 <div
-                  key={item.id}
+                  key={item.certId}
                   //리스트의 마지막
                   className={`p-2 ${!isLast ? "border-b border-gray-200" : ""}`}
                 >
                   <SearchListCard
-                    title={item.title}
-                    category={item.category}
-                    description={item.description}
+                    title={item.name}
+                    category={String(item.categoryId)}
+                    description={item.description ?? ""}
                   />
                 </div>
               );
