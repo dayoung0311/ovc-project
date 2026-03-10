@@ -3,6 +3,7 @@ import SearchGridCard from "../../components/common/cards/SearchGridCard";
 import SearchListCard from "../../components/common/cards/SearchListCard";
 import { Search } from "lucide-react";
 import { useCertSearch } from "../../hooks/useCertSearch";
+import { useCategory } from "../../hooks/useCategory";
 
 function CertSearch() {
   const [viewType, setViewType] = useState("grid");
@@ -16,14 +17,28 @@ function CertSearch() {
   const [categoryIds, setCategoryIds] = useState<number[]>([]);
 
   const { data, isLoading, isError } = useCertSearch({
-    keyword,
-    categoryIds,
-    page: 0,
-    size: 6,
-    sort: "name,ASC",
+    keyword, //검색어
+    categoryIds, //카테고리 ids
+    page: 0, //1페이지
+    size: 6, //한페이지에 6개
+    sort: "name,ASC", //이름을 기준으로 오름차순
   });
 
+  //api로 가져온 애들 null일 경우 빈배열
   const certs = data?.data.content ?? [];
+
+  //카테고리를 가져오는 hooks
+  const {
+    data: categoryData,
+    isLoading: isCategoryLoading,
+    isError: isCategoryError,
+  } = useCategory();
+
+  const categories = categoryData?.data ?? [];
+  const getCategoryName = (categoryId: number) => {
+    return categories.find((category) => category.id === categoryId)?.name ?? "";
+  };
+
 
   const handleCategoryChange = (categoryId: number) => {
     setSelectedCategories((prev) =>
@@ -38,21 +53,10 @@ function CertSearch() {
     setKeyword(searchInput);
     setCategoryIds(selectedCategories);
   };
-
-  //   //카테고리를 하나도 안 체크하면 전체 허용
-  //   //체크된 카테고리가 있으면 해당 카테고리만 허용
-  //   const filteredItems = items.filter((item) => {
-  //     const matchesCategory =
-  //       appliedCategories.length === 0 ||
-  //       appliedCategories.includes(item.category);
-
-  //     //검색어는 제목 | 설명으로도 검색가능
-  //     const matchesSearch =
-  //       item.title.toLowerCase().includes(appliedSearch.toLowerCase()) ||
-  //       item.description.toLowerCase().includes(appliedSearch.toLowerCase());
-
-  //     return matchesCategory && matchesSearch;
-  //   });
+  console.log("categories", categories);
+console.log("certs", certs);
+console.log(categories.map((c) => c.id));
+console.log(certs.map((c) => c.certId));
 
   return (
     <div className="flex flex-row">
@@ -60,32 +64,24 @@ function CertSearch() {
       <div className="w-[320px] h-screen p-[50px] bg-green-100">
         <h3 className="font-medium text-lg mb-6">카테고리</h3>
         <div className="space-y-4">
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={selectedCategories.includes(1)}
-              onChange={() => handleCategoryChange(1)}
-            />
-            <span>IT/기술</span>
-          </label>
+          {isCategoryLoading && <p>카테고리 불러 오는 중...</p>}
+          {isCategoryError && <p>카테고리를 불러오지 못했습니다.</p>}
 
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={selectedCategories.includes(2)}
-              onChange={() => handleCategoryChange(2)}
-            />
-            <span>경영/비즈니스</span>
-          </label>
-
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={selectedCategories.includes(3)}
-              onChange={() => handleCategoryChange(3)}
-            />
-            <span>금융/회계</span>
-          </label>
+          {!isCategoryLoading &&
+            !isCategoryError &&
+            categories.map((category) => (
+              <label
+                key={category.id}
+                className="flex items-center gap-3 cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedCategories.includes(category.id)}
+                  onChange={() => handleCategoryChange(category.id)}
+                />
+                <span>{category.name}</span>
+              </label>
+            ))}
         </div>
       </div>
       {/* 우측 - 카드 영역 */}
@@ -145,7 +141,6 @@ function CertSearch() {
           </div>
         )}
 
-
         {viewType === "grid" && (
           <div className="flex flex-wrap gap-x-6 gap-y-6 w-full">
             {certs.map((item) => {
@@ -153,7 +148,7 @@ function CertSearch() {
                 <div key={item.certId}>
                   <SearchGridCard
                     title={item.name}
-                    category={String(item.categoryId)}
+                    category={getCategoryName(item.categoryId)}
                     description={item.description ?? ""}
                   />
                 </div>
@@ -177,7 +172,7 @@ function CertSearch() {
                 >
                   <SearchListCard
                     title={item.name}
-                    category={String(item.categoryId)}
+                    category={getCategoryName(item.categoryId)}
                     description={item.description ?? ""}
                   />
                 </div>

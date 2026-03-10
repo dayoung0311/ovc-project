@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getCerts } from "../api/cert";
+import { getCerts } from "../api/certSearch";
 import type { CertSearchParams } from "../types/cert";
 
 export const useCertSearch = (params: CertSearchParams) => {
