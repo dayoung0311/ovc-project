@@ -1,21 +1,23 @@
-import { Link, Route, Routes } from 'react-router-dom'
-import './App.css'
-import HomePage from './pages/Home/HomePage'
-import SchedulePage from './pages/Calendar/CalendarPage'
+import styles from './App.module.css'
+import Header from './components/layout/Header/Header'
+import Footer from './components/layout/Footer/Footer'
+import Router from './routes/Router'
 
 function App() {
 
   return (
-    <div>
-      <nav>
-        <Link to="/">홈</Link>
-        <Link to="/calendar">일정 페이지</Link>
-      </nav>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <Header />
+      </div>
 
-      <Routes>
-        <Route path="/" element={<HomePage/>}/>
-        <Route path="/calendar" element={<SchedulePage/>}/>
-      </Routes>
+      <main className={styles.main}>
+        <Router/>
+      </main>
+
+      <div className={styles.footer}>
+        <Footer />
+      </div>
     </div>
   )
 }
