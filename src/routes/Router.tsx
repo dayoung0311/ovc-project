@@ -6,7 +6,7 @@ import CertManage from "../pages/CertManage/CertManage";
 import CertSearch from "../pages/CertSearch/CertSearch";
 import MyPage from "../pages/MyPage/MyPage";
 import LoginPage from "../pages/Login/LoginPage";
-import SignupPage from "../pages/Signup/SignupPage";
+import OAuthSuccess from "../pages/Login/OAuthSuccess";
 
 function Router() {
   return (
@@ -17,7 +17,7 @@ function Router() {
       <Route path="/cert-search" element={<CertSearch />} />
       <Route path="/mypage" element={<MyPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/oauth-success" element={<OAuthSuccess />}/>
     </Routes>
   );
 }
