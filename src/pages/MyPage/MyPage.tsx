@@ -3,6 +3,9 @@
 // import { useNavigate } from "react-router-dom";
 // import { getMyInfo } from "../../api/user";
 
+import { useQuery } from "@tanstack/react-query"
+import { getMyInfo } from "../../api/user"
+
 // function MyPage() {
 //     const [isLogin, setIsLogin] = useState(false);
 //     const navigate = useNavigate();
@@ -113,6 +116,13 @@
 // export default MyPage
 
 function MyPage() {
+    // const {data: user, isLoading} = useQuery({
+    //     queryKey: ["myInfo"],
+    //     queryFn: getMyInfo
+    // });
+
+    // if(isLoading) return <div>로딩중...</div>
+
     return (
         <div className="p-[40px]">
             <div className="flex flex-col">
@@ -126,8 +136,8 @@ function MyPage() {
                     {/* 이미지 카드 섹션 */}
                     <div className="w-56 h-56 bg-gray-300 rounded-full mr-[50px]"></div>
                     <div className="flex flex-col">
-                        <p className="font-bold text-[35px]">이다영</p>
-                        <p className="text-gray-500 text-[18px]">dayounglee0311@gmail.com</p>
+                        {/* <p className="font-bold text-[35px]">{user.email}</p>
+                        <p className="text-gray-500 text-[18px]">{user.userName}</p> */}
                     </div>
                 </div>
                 <button className="w-full mt-[30px] mb-[8px] py-3 bg-green-700 text-gray-100 rounded-lg">프로필 편집</button>
