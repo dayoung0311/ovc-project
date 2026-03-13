@@ -18,7 +18,7 @@ export const getCerts = async (
     sort = "name,ASC",
   } = params;
 
-  const response = await apiClient.get<ApiResponse<CertPageData>>("/certs", {
+  const response = await apiClient.get<ApiResponse<CertPageData>>("/api/certs", {
     params: {
       categoryIds,
       keyword,
