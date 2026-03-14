@@ -4,6 +4,7 @@ interface MyCertCardProps {
   certNum?: string;
   passingDate: string;
   expirationDate?: string;
+  onDelete?: () => void;
 }
 
 const MyCertCard = ({
@@ -12,6 +13,7 @@ const MyCertCard = ({
   certNum,
   passingDate,
   expirationDate,
+  onDelete,
 }: MyCertCardProps) => {
   return (
     <article className="w-full rounded-xl border border-slate-200 bg-white p-5 shadow-xl ">
@@ -21,6 +23,13 @@ const MyCertCard = ({
           <p className="mt-2 text-base text-slate-500">{authority}</p>
           <p className="mt-2 text-sm text-slate-500">자격증 번호: {certNum}</p>
         </div>
+        <button
+          type="button"
+          onClick={onDelete}
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-red-600 text-sm font-bold text-white hover:bg-red-700"
+        >
+          X
+        </button>
       </div>
 
       <div className="my-5 h-px bg-slate-200" />
@@ -39,9 +48,6 @@ const MyCertCard = ({
         </div>
       </div>
 
-      <button className="mt-6 w-full rounded-2xl bg-green-900 py-3 font-bold text-white">
-        자격증 확인
-      </button>
     </article>
   );
 };

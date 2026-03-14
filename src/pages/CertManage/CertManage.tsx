@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import MyCertCard from "../../components/common/cards/MyCertCard";
 import MyWishlistCard, {
   WISHLIST_CARD_TYPE,
@@ -8,6 +10,12 @@ import Modal from "../../components/common/modal/Modal";
 import CertRegisterForm, {
   type CertRegisterFormValues,
 } from "../../components/common/forms/CertRegisterForm";
+import {
+  addMyCert,
+  deleteMyCert,
+  getMyCerts,
+  type MyCertResponse,
+} from "../../api/user";
 
 type CertItem = {
   id: number;
@@ -17,30 +25,86 @@ type CertItem = {
   passingDate: string;
   expirationDate?: string;
 };
+
+const mapMyCertResponse = (cert: MyCertResponse): CertItem => ({
+  id: cert.id,
+  name: cert.name,
+  authority: cert.authority,
+  certNum: cert.certNum ?? undefined,
+  passingDate: cert.passingDate,
+  expirationDate: cert.expirationDate ?? undefined,
+});
+
 function CertManage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const queryClient = useQueryClient();
 
-  const [certList, setCertList] = useState<CertItem[]>([
-    {
-      id: 1,
-      name: "SQL Developer (SQLD)",
-      authority: "한국 데이터 산업 진흥회",
-      passingDate: "2026-03-07",
-      expirationDate: "",
+  const {
+    data: myCerts = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["myCerts"],
+    queryFn: getMyCerts,
+    // 토큰 조건으로 조회를 제한하려면 enabled 옵션을 다시 활성화하면 된다.
+    retry: false, // 인증 이슈 시 과도한 재시도 방지
+  });
+
+  const certList = myCerts.map(mapMyCertResponse);
+
+  const addMyCertMutation = useMutation({
+    mutationFn: async (values: CertRegisterFormValues) => {
+      if (!values.certId) {
+        throw new Error("CERT_NOT_SELECTED");
+      }
+
+      await addMyCert(values.certId, {
+        certNum: values.certNum?.trim() || undefined,
+        certNumber: values.certNum?.trim() || undefined,
+        passingDate: values.passingDate,
+        passedAt: values.passingDate,
+        expirationDate: values.expirationDate?.trim() || undefined,
+        expiredAt: values.expirationDate?.trim() || undefined,
+        authority: values.authority.trim(),
+      });
     },
-  ]);
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["myCerts"] });
+    },
+  });
 
-  const handleCreateCert = (values: CertRegisterFormValues) => {
-    const newCert: CertItem = {
-      id: Date.now(),
-      name: values.name,
-      authority: values.authority,
-      certNum: values.certNum || undefined,
-      passingDate: values.passingDate,
-      expirationDate: values.expirationDate || undefined,
-    };
+  const deleteMyCertMutation = useMutation({
+    mutationFn: (certId: number) => deleteMyCert(certId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["myCerts"] });
+    },
+  });
 
-    setCertList((prev) => [newCert, ...prev]);
+  const handleCreateCert = async (values: CertRegisterFormValues) => {
+    try {
+      await addMyCertMutation.mutateAsync(values);
+    } catch (error) {
+      if (error instanceof Error && error.message === "CERT_NOT_SELECTED") {
+        alert("자격증을 목록에서 선택해주세요.");
+      } else if (isAxiosError(error) && error.response?.status === 409) {
+        // 409(중복 등록)은 실패가 아니라 이미 완료된 상태로 간주
+        await queryClient.invalidateQueries({ queryKey: ["myCerts"] });
+        alert("이미 등록된 자격증입니다. 등록 완료 상태로 처리됩니다.");
+        return;
+      } else {
+        alert("자격증 등록에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      }
+      throw error;
+    }
+  };
+
+  const handleDeleteCert = async (cert: CertItem) => {
+    try {
+      await deleteMyCertMutation.mutateAsync(cert.id);
+    } catch (error) {
+      console.error("자격증 삭제 실패", error);
+      alert("자격증 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    }
   };
   return (
     <div className="p-10">
@@ -72,18 +136,26 @@ function CertManage() {
               {certList.length}개 취득 완료
             </div>
           </div>
-          <div className="space-y-4">
-            {certList.map((cert) => (
-              <MyCertCard
-                key={cert.id}
-                name={cert.name}
-                authority={cert.authority}
-                certNum={cert.certNum || "-"}
-                passingDate={cert.passingDate}
-                expirationDate={cert.expirationDate || "-"}
-              />
-            ))}
-          </div>
+
+          {isLoading ? (
+            <p className="text-sm text-gray-500">자격증 목록을 불러오는 중입니다...</p>
+          ) : isError ? (
+            <p className="text-sm text-red-500">자격증 목록 조회에 실패했습니다.</p>
+          ) : (
+            <div className="space-y-4">
+              {certList.map((cert, index) => (
+                <MyCertCard
+                  key={`${cert.id}-${cert.certNum ?? "no-cert-num"}-${cert.passingDate}-${index}`}
+                  name={cert.name}
+                  authority={cert.authority}
+                  certNum={cert.certNum || "-"}
+                  passingDate={cert.passingDate}
+                  expirationDate={cert.expirationDate || "-"}
+                  onDelete={() => void handleDeleteCert(cert)}
+                />
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="w-[60%] rounded-2xl bg-[#F6F7F7] p-4 shadow-sm">
@@ -97,7 +169,7 @@ function CertManage() {
             </div>
           </div>
           <div className="flex justify-center"></div>
-          <div className="grid grid-cols-2 gap-y-4 gap-x-6 mx-auto w-fit">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-4 mx-auto w-fit">
             <MyWishlistCard
               type={WISHLIST_CARD_TYPE.APPLY}
               title="TOEIC Listening & Reading"
@@ -136,6 +208,7 @@ function CertManage() {
         <CertRegisterForm
           onClose={() => setIsModalOpen(false)}
           onCreate={handleCreateCert}
+          isSubmitting={addMyCertMutation.isPending}
         />
       </Modal>
     </div>
