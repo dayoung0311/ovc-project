@@ -10,6 +10,7 @@ import { IoCloseSharp } from "react-icons/io5";
 import './calendar.css'
 import { useQuery } from "@tanstack/react-query";
 import CertScheduleDetailModal from "../../components/common/modal/CertScheduleDetailModal";
+import { Search } from "lucide-react";
 
 
 function CalendarPage() {
@@ -35,7 +36,11 @@ function CalendarPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     //일정 상세조회 버튼 클릭 시 모달 전체 일정 조회를 위한 state
-    const [certSchedules, setCertSchedules]=useState<Schedule[]>([]);
+    const [certSchedules, setCertSchedules] = useState<Schedule[]>([]);
+
+
+    //검색창에 입력하는 값
+    const [searchInput, setSearchInput] = useState("");
 
     // 일정 API 호출
     const { data: schedules = [], isLoading, error } = useQuery({
@@ -43,10 +48,22 @@ function CalendarPage() {
         queryFn: () => getSchedules(year, month)
     });
 
+    //schedules 또는 searchInput이 바뀌면 자동으로 필터 다시 계산
+    const filteredSchedules = useMemo(() => {
+        if (!searchInput.trim()) return schedules;
+
+        return schedules.filter((schedule) =>
+            //자격증 이름에 검색어가 포함되어 있으면 일정을 유지함 
+            schedule.certificateName
+                .toLowerCase()
+                .includes(searchInput.toLowerCase())
+        );
+    }, [schedules, searchInput])
+
     // FullCalendar 이벤트 변환
     const events = useMemo(() => {
-        return mapSchedulesToEvents(schedules);
-    }, [schedules]);
+        return mapSchedulesToEvents(filteredSchedules);
+    }, [filteredSchedules]);
 
     // 일정 클릭
     const handleEventClick = useCallback(async (info: EventClickArg) => {
@@ -82,59 +99,61 @@ function CalendarPage() {
 
     // 모달용 일정
     const handleOpenScheduleModal = async () => {
-        if(!selectedSchedule) return;
+        if (!selectedSchedule) return;
 
         console.log("selectedSchedule:", selectedSchedule);
-    console.log("certId:", selectedSchedule?.certId);
+        console.log("certId:", selectedSchedule?.certId);
 
         try {
-            const data=await getSchedulesByCertificate (
+            const data = await getSchedulesByCertificate(
                 selectedSchedule.certId,
                 year
             );
             setCertSchedules(data);
 
             setIsModalOpen(true);
-        } catch(error) {
+        } catch (error) {
             console.log("자격증 전체 일정 불러오기 실패", error);
             throw error;
         }
     }
-  
+
     if (isLoading) return <div>일정을 불러오는 중...</div>
     if (error) return <div>일정 데이터를 불러오는데 실패했습니다.</div>
 
     return (
         <div className="flex">
-
             {/* 캘린더 */}
-            <div className="flex-1 p-[40px]">
+            <div className="flex-1 p-[40px] flex flex-col gap-4">
+
+                {/* 검색창 */}
+                <div className="flex justify-end">
+                    <div className="flex w-[300px] border border-gray-300 rounded-lg px-3 py-2 items-center gap-2">
+                        <input
+                            className="flex-1 outline-none"
+                            type="text"
+                            placeholder="일정 검색..."
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                        />
+                        <Search size={18} />
+                    </div>
+                </div>
 
                 <FullCalendar
                     plugins={[dayGridPlugin]}
-
                     initialView="dayGridMonth"
-
-                    // 현재 캘린더 날짜 유지
                     initialDate={currentDate}
-
                     events={events}
-
                     eventClick={handleEventClick}
-
                     eventClassNames={handleEventClassNames}
-
                     datesSet={(info) => {
                         const date = info.view.currentStart;
                         setCurrentDate(date);
                     }}
-
                     height="auto"
-
                     displayEventTime={false}
-
                     eventDisplay="block"
-
                     headerToolbar={{
                         left: "",
                         center: "prev title next",
