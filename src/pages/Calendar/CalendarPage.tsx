@@ -358,6 +358,8 @@ function CalendarPage() {
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
                     schedules={certSchedules}
+                    // 선택한 카드의 자격증명을 모달 제목으로 고정해 회차명이 섞이지 않게 한다.
+                    title={selectedSchedule ? `${selectedSchedule.certificateName} 일정` : undefined}
                 />
             </div>
         </div>
