@@ -1,39 +1,55 @@
+import { motion } from "framer-motion"
+
 function SectionCTA() {
-
   return (
-    <section className="py-32 bg-gradient-to-r from-primary to-primaryLight text-white">
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-b from-white via-primarySoft/40 to-primarySoft">
+      <div className="max-w-[1400px] mx-auto px-10 lg:px-20 w-full text-center">
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-primary font-semibold mb-6 tracking-wide"
+        >
+          GET STARTED
+        </motion.p>
 
-      <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-center">
+        <motion.h2
+          initial={{ opacity: 0, y: 36 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="text-5xl lg:text-6xl font-bold mb-8 text-gray-900 leading-tight"
+        >
+          지금 OVC로 시작하세요
+        </motion.h2>
 
-        <div>
+        <motion.p
+          initial={{ opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.7 }}
+          viewport={{ once: true }}
+          className="text-gray-600 text-lg lg:text-xl mb-12 leading-8"
+        >
+          자격증 준비의 모든 과정을
+          <br className="hidden sm:block" />
+          하나의 플랫폼에서 관리하세요.
+        </motion.p>
 
-          <h2 className="text-3xl font-bold mb-6">
-            OVC로 자격증 준비를
-            더 쉽게 시작하세요
-          </h2>
-
-          <p className="opacity-80 mb-8">
-            시험 일정 관리, 자격증 정보 탐색,
-            커뮤니티까지 하나의 플랫폼에서 제공합니다.
-          </p>
-
-          <button className="bg-white text-primary px-6 py-3 rounded-full font-semibold">
-            시작하기
-          </button>
-
-        </div>
-
-        <div className="flex justify-center">
-
-          <div className="w-64 h-96 bg-white rounded-3xl shadow-2xl"></div>
-
-        </div>
-
+        <motion.button
+          initial={{ opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25, duration: 0.7 }}
+          viewport={{ once: true }}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.98 }}
+          className="bg-primary text-lg lg:text-xl text-white font-semibold px-16 sm:px-24 lg:px-32 py-5 lg:py-6 rounded-full transition"
+        >
+          시작하기
+        </motion.button>
       </div>
-
     </section>
   )
-
 }
 
 export default SectionCTA

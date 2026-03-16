@@ -128,7 +128,7 @@ function CertManage() {
     <div className="p-10">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="mb-2 text-4xl font-bold">내 자격증</h1>
+          <h1 className="mb-2 text-4xl font-bold">자격증 관리</h1>
           <p className="mb-8 text-gray-500">
             전문적인 성과를 관리하고 향후 학습 목표를 추적하세요.
           </p>

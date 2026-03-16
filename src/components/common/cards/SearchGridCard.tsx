@@ -9,8 +9,13 @@ interface SearchGridCardProps {
   onScheduleClick?: () => void;
 }
 
-function SearchGridCard({ certId, title, category, description, onScheduleClick }: SearchGridCardProps) {
-
+function SearchGridCard({
+  certId,
+  title,
+  category,
+  description,
+  onScheduleClick,
+}: SearchGridCardProps) {
   const queryClient = useQueryClient();
 
   const addFavoriteMutation = useMutation({
@@ -25,50 +30,51 @@ function SearchGridCard({ certId, title, category, description, onScheduleClick 
       if (error?.response?.status === 409) {
         alert("이미 찜한 자격증입니다.");
       } else {
-        alert("찜 추가에 실패했습니다,");
+        alert("찜 추가에 실패했습니다.");
       }
-    }
+    },
   });
 
   return (
-    <div className="w-[400px] bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition overflow-hidden">
-      {/* 상단 영역 */}
-      <div className="p-6 flex items-start justify-between">
-        <p className="text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm font-medium">
+    <div className="w-full h-full rounded-[28px] border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition">
+      {/* 상단 */}
+      <div className="px-6 pt-6 pb-4 flex items-start justify-between">
+        <span className="inline-flex items-center rounded-full border border-[#B8CE52] bg-[#B8CE52] px-3 py-1 text-sm font-semibold text-[#1A0089]">
           {category}
-        </p>
+        </span>
       </div>
 
-      {/* 제목 + 설명 */}
-      <div className="h-[240px] px-6 pb-6 flex flex-col gap-3">
-        <h3 className="text-2xl font-bold text-gray-900 leading-tight">
+      {/* 본문 */}
+      <div className="px-6 pb-6 min-h-[220px] flex flex-col">
+        <h3 className="text-[30px] font-bold text-gray-900 leading-[1.2] break-keep">
           {title}
         </h3>
 
-        <p className="text-gray-500 text-base pb-10 leading-relaxed">
+        <div className="mt-4 h-[2px] w-21 rounded-full bg-[#1A0089]" />
+
+        <p className="mt-5 text-[15px] leading-7 text-gray-500 break-keep">
           {description}
         </p>
       </div>
 
-      {/* 하단 버튼 영역 */}
-      <div className="border-t bg-gray-50 border-gray-100 p-6 flex items-center justify-between">
+      {/* 하단 */}
+      <div className="border-t border-[#f1e5c8] bg-[#fffaf0] px-6 py-5 flex justify-end gap-3">
         <button
           onClick={() => {
-            console.log("일정 보기 버튼 클릭");
-            onScheduleClick?.();
+            addFavoriteMutation.mutate();
           }}
-          className="flex items-center gap-2 bg-green-700 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-800 transition cursor-pointer"
+          className="w-[160px] h-[50px] rounded-xl border border-[#eadcb7] bg-[#FFF3D6] text-[#5b4a1f] font-semibold hover:bg-[#f8e8c4] transition"
         >
-          일정 보기
+          내 찜에 추가
         </button>
 
         <button
           onClick={() => {
-            console.log("찜 버튼 클릭", certId);
-            addFavoriteMutation.mutate()
+            onScheduleClick?.();
           }}
-          className="bg-green-100 text-green-900 px-5 py-2 rounded-full font-medium hover:bg-green-200 transition">
-          내 찜에 추가
+          className="w-[160px] h-[50px] rounded-xl bg-[#FE5E32] text-white font-semibold hover:bg-[#e45127] transition"
+        >
+          일정 보기
         </button>
       </div>
     </div>

@@ -99,60 +99,92 @@ function CertSearch() {
   };
 
   return (
-    <div className="flex flex-row">
+    <div className="flex">
       {/* 좌측 - 사이드바 영역 */}
-      <div className="w-[320px] h-auto p-[50px] bg-green-100">
-        <h3 className="font-medium text-lg mb-6">카테고리</h3>
-        <div className="space-y-4">
-          {isCategoryLoading && <p>카테고리 불러 오는 중...</p>}
-          {isCategoryError && <p>카테고리를 불러오지 못했습니다.</p>}
+      <div className="w-[420px] shrink-0 min-h-screen bg-[#FFF9EC] border-r border-[#ECE7D8] p-8 animate-slideIn">
+        <div className="pb-6 border-b border-[#ECE7D8]">
+          <h3 className="font-semibold text-[22px] text-[#1A0089]">
+            카테고리
+          </h3>
+          <p className="mt-2 text-sm text-[#6B7280]">
+            원하는 분야를 선택해서 자격증을 찾아보세요.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-2 pt-6">
+          {isCategoryLoading && (
+            <p className="text-sm text-gray-500">카테고리 불러오는 중...</p>
+          )}
+
+          {isCategoryError && (
+            <p className="text-sm text-red-500">
+              카테고리를 불러오지 못했습니다.
+            </p>
+          )}
 
           {!isCategoryLoading &&
             !isCategoryError &&
-            categories.map((category) => (
-              <label
-                key={category.id}
-                className="flex items-center gap-3 cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedCategories.includes(category.id)}
-                  onChange={() => handleCategoryChange(category.id)}
-                />
-                <span>{category.name}</span>
-              </label>
-            ))}
+            categories.map((category) => {
+              const isSelected = selectedCategories.includes(category.id);
+
+              return (
+                <label
+                  key={category.id}
+                  className={`flex items-center gap-4 cursor-pointer px-3 py-5 rounded-xl transition ${isSelected
+                    ? "bg-[#FFF3D6] border border-[#E7DAB7]"
+                    : "hover:bg-[#FFF3D6]/60"
+                    }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => handleCategoryChange(category.id)}
+                    className="w-5 h-5 accent-[#1A0089]"
+                  />
+
+                  <span
+                    className={`text-base ${isSelected
+                      ? "text-[#1A0089] font-semibold"
+                      : "text-gray-700"
+                      }`}
+                  >
+                    {category.name}
+                  </span>
+                </label>
+              );
+            })}
         </div>
       </div>
+
       {/* 우측 - 카드 영역 */}
-      <div className="flex-1 p-8">
-        <div className="flex justify-between">
+      <div className="flex-1 min-w-0 p-8">
+        <div className="flex justify-between items-start gap-6 mb-6">
           <div>
             <h1 className="font-semibold text-4xl pb-2">자격증 탐색</h1>
-            <p className="pb-5">
+            <p className="text-gray-600">
               커리어를 한 단계 높여줄 최적의 자격증을 리스트에서 확인해보세요.
             </p>
           </div>
-          <div className="flex h-fit p-2 bg-gray-100 rounded-lg gap-4 mb-6">
+
+          <div className="flex h-fit p-2 bg-gray-100 rounded-lg gap-2">
             <button
-              onClick={() => {
-                setViewType("grid");
-              }}
-              className="px-4 h-fit rounded-lg  hover:bg-gray-300 transition font-medium"
+              onClick={() => setViewType("grid")}
+              className={`px-4 py-2 rounded-lg transition font-medium ${viewType === "grid" ? "bg-white shadow-sm" : "hover:bg-gray-200"
+                }`}
             >
               그리드
             </button>
             <button
-              onClick={() => {
-                setViewType("list");
-              }}
-              className="px-4  h-fit rounded-lg hover:bg-gray-300 transition font-medium"
+              onClick={() => setViewType("list")}
+              className={`px-4 py-2 rounded-lg transition font-medium ${viewType === "list" ? "bg-white shadow-sm" : "hover:bg-gray-200"
+                }`}
             >
               리스트
             </button>
           </div>
         </div>
-        <div className="flex w-full border border-black-200 justify-between px-6 py-5 rounded-xl mb-[24px] gap-2">
+
+        <div className="flex w-full border border-gray-300 justify-between px-6 py-5 rounded-xl mb-6 gap-2">
           <input
             className="w-full outline-none"
             type="text"
@@ -160,14 +192,12 @@ function CertSearch() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSearch();
-              }
+              if (e.key === "Enter") handleSearch();
             }}
           />
           <button
             onClick={handleSearch}
-            className="p-2 rounded hover:bg-gray-200 transition"
+            className="p-2 rounded hover:bg-gray-100 transition"
           >
             <Search size={20} />
           </button>
@@ -182,14 +212,32 @@ function CertSearch() {
         )}
 
         {viewType === "grid" && (
-          <div className="flex flex-wrap gap-x-6 gap-y-6 w-full">
-            {certs.map((item) => {
+          <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6 w-full">
+            {certs.map((item) => (
+              <div key={item.certId} className="w-full">
+                <SearchGridCard
+                  certId={item.certId}
+                  title={item.name}
+                  category={getCategoryName(item.categoryId)}
+                  description={item.description ?? ""}
+                  onScheduleClick={() => handleOpenModal(item.certId)}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {viewType === "list" && (
+          <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white">
+            {certs.map((item, index) => {
+              const isLastItem = index === certs.length - 1;
+
               return (
                 <div
                   key={item.certId}
+                  className={`p-2 ${!isLastItem ? "border-b border-gray-200" : ""}`}
                 >
-                  <SearchGridCard
-                    certId={item.certId}
+                  <SearchListCard
                     title={item.name}
                     category={getCategoryName(item.categoryId)}
                     description={item.description ?? ""}
@@ -201,70 +249,48 @@ function CertSearch() {
           </div>
         )}
 
-        {/* 필터아이템의 길이가 0보다 클때 리스트화 */}
-        {viewType === "list" && (
-          <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white">
-            {certs.map((item, index) => {
-              const isLast = index === certs.length - 1;
-
-              return (
-                // 리스트를 감싸는 div
-                <div
-                  key={item.certId}
-                  //리스트의 마지막
-                  className={`p-2 ${!isLast ? "border-b border-gray-200" : ""}`}
-                >
-                  <SearchListCard
-                    title={item.name}
-                    category={getCategoryName(item.categoryId)}
-                    description={item.description ?? ""}
-                    onScheduleClick={()=>{
-                      console.log("선택된 certId:", item.certId);
-                      handleOpenModal(item.certId)}}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        )}
-
+        {/* 페이지네이션 부분 */}
         {totalPages > 1 && (
-          <div className="flex justify-center items-center gap-2 mt-8">
+          <div className="flex justify-center items-center gap-2 mt-10">
             <button
               onClick={handlePrevPage}
               disabled={isFirst}
-              className="px-3 py-2 border rounded disabled:opacity-40"
+              className="min-w-[72px] px-4 py-2.5 rounded-xl border border-[#E7DAB7] bg-[#FFF3D6] text-[#6B5520] font-semibold hover:bg-[#F7E8C2] transition disabled:opacity-40 disabled:cursor-not-allowed"
             >
               이전
             </button>
-            {pageNumbers.map((pageNumber) => (
-              <button
-                key={pageNumber}
-                onClick={() => handlePageClick(pageNumber)}
-                className={`px-3 py-2 border rounded ${currentPage === pageNumber
-                    ? "bg-black text-white"
-                    : "bg-white"
-                  }`}
-              >
-                {pageNumber + 1}
-              </button>
-            ))}
+
+            <div className="flex items-center gap-2">
+              {pageNumbers.map((pageNumber) => (
+                <button
+                  key={pageNumber}
+                  onClick={() => handlePageClick(pageNumber)}
+                  className={`w-11 h-11 rounded-xl text-sm font-semibold transition ${currentPage === pageNumber
+                      ? "bg-[#1A0089] text-white shadow-sm"
+                      : "bg-white border border-[#ECE7D8] text-[#1A0089] hover:bg-[#FFF3D6]"
+                    }`}
+                >
+                  {pageNumber + 1}
+                </button>
+              ))}
+            </div>
+
             <button
               onClick={handleNextPage}
               disabled={isLast}
-              className="px-3 py-2 border rounded disabled:opacity-40"
+              className="min-w-[72px] px-4 py-2.5 rounded-xl border border-[#E7DAB7] bg-[#FFF3D6] text-[#6B5520] font-semibold hover:bg-[#F7E8C2] transition disabled:opacity-40 disabled:cursor-not-allowed"
             >
               다음
             </button>
           </div>
         )}
       </div>
+
       <CertDetailModal
         isOpen={isModalOpen}
         certId={selectedCertId}
         onClose={() => setIsModalOpen(false)}
       />
-
     </div>
   );
 }

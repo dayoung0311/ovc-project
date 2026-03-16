@@ -5,15 +5,17 @@ import SectionMyCert from "../../sections/SectionMyCert"
 import SectionSearch from "../../sections/SectionSearch"
 
 function HomePage() {
-    return (
-       <div className="w-full overflow-x-hidden">
-            <SectionHero/>
-            <SectionCalendar/>
-            <SectionSearch/>
-            <SectionMyCert/>
-            <SectionCTA/>
-        </div>
-    )
+  return (
+    <main className="bg-white">
+
+      <SectionHero />
+      <SectionCalendar />
+      <SectionSearch />
+      <SectionMyCert />
+      <SectionCTA />
+
+    </main>
+  )
 }
 
 export default HomePage

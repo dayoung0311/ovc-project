@@ -1,60 +1,66 @@
-/* 캘린더 전체 카드 스타일 */
+/* 전체 캘린더 박스 */
 .fc {
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
   font-family: Pretendard, sans-serif;
 }
 
-.fc-today-button.fc-button.fc-button-primary {
-  padding: 10px !important;
-  background-color: #f4f4f4 !important;
-  color: rgb(72, 72, 72) !important;
-}
-
-.fc-today-button.fc-button.fc-button-primary:hover {
-  background-color: #16a34a !important;
-  color: white !important;
-}
-
+/* 툴바 */
 .fc-toolbar-title {
-  margin: 0 6px;
+  margin: 0 8px;
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 700;
+  color: #111827;
 }
 
 .fc-toolbar-chunk {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
 }
 
-.fc-today-button {
-  background-color: #22c55e !important;
-  color: white !important;
-  border-radius: 8px !important;
-}
-
-/* 이전 다음 버튼 */
+/* 이전/다음 버튼 */
 .fc-button {
   background: none !important;
   border: none !important;
   box-shadow: none !important;
-  color: black !important;
+  color: #111827 !important;
   padding: 4px 8px !important;
 }
 
-/* hover 시 배경 제거 */
 .fc-button:hover {
   background: none !important;
-  color: black !important;
+  color: #1A0089 !important;
+}
+
+/* today 버튼 */
+.fc-today-button {
+  padding: 10px 14px !important;
+  background-color: #FFF3D6 !important;
+  color: #5b4a1f !important;
+  border: 1px solid #f1e3bd !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+}
+
+.fc-today-button:hover {
+  background-color: #f8e8c4 !important;
+  color: #3f330f !important;
+}
+
+.fc-today-button.fc-button.fc-button-primary {
+  padding: 10px 14px !important;
+  background-color: #FFF3D6 !important;
+  color: #5b4a1f !important;
 }
 
 /* 요일 헤더 */
 .fc-col-header-cell {
   background: #f9fafb;
-  font-weight: 600;
+  font-weight: 700;
   color: #374151;
+  border-color: #e5e7eb !important;
 }
 
 /* 날짜 셀 */
@@ -62,52 +68,108 @@
   transition: background 0.2s;
 }
 
-/* hover 효과 */
 .fc-daygrid-day:hover {
-  background: #f3f4f6;
+  background: #fafafa;
 }
 
-/* 오늘 날짜 */
 .fc-day-today {
-  background: #ecfdf5 !important;
-}
-/* 
-/* 이벤트 카드 */
-.fc-event {
-  border: none;
-  border-radius: 6px;
-  padding: 2px 4px;
-  font-size: 12px;
-  background-color: #22c55e;
-} */
-
-/* 이벤트 hover */
-.fc-event:hover {
-  background-color: #16a34a;
+  background: #fffdf7 !important;
 }
 
 /* 날짜 숫자 */
 .fc-daygrid-day-number {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   color: #374151;
 }
 
-/* eventType별 색깔 지정 CSS */
+/* 이벤트 공통 */
+.fc-event {
+  border-radius: 8px !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  min-height: 22px !important;
+  display: flex !important;
+  align-items: center !important;
+  margin: 2px 0 !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+.fc-h-event .fc-event-title,
+.fc-event .fc-event-main,
+.fc-event .fc-event-main-frame {
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+}
+
+/* APPLY */
 .event-apply {
-  background-color: #3b82f6 !important;
-  border-color: #3b82f6 !important;
-  color: white !important;
+  background-color: #1A0089 !important;
+  border: 1px solid #1A0089 !important;
+  color: #ffffff !important;
 }
 
+.event-apply .fc-event-title,
+.event-apply .fc-event-main,
+.event-apply .fc-event-main-frame {
+  color: #ffffff !important;
+}
+
+.event-apply:hover {
+  background-color: #14006d !important;
+  border-color: #14006d !important;
+}
+
+/* EXAM */
 .event-exam {
-  background-color: #ef4444 !important;
-  border-color: #ef4444 !important;
-  color: white !important;
+  background-color: #FE5E32 !important;
+  border: 1px solid #FE5E32 !important;
+  color: #ffffff !important;
 }
 
+.event-exam .fc-event-title,
+.event-exam .fc-event-main,
+.event-exam .fc-event-main-frame {
+  color: #ffffff !important;
+}
+
+.event-exam:hover {
+  background-color: #e95128 !important;
+  border-color: #e95128 !important;
+}
+
+/* RESULT */
 .event-result {
-  background-color: #22c55e !important;
-  border-color: #22c55e !important;
-  color: white !important;
+  background-color: #B8CE52 !important;
+  border: 1px solid #B8CE52 !important;
+  color: #1f2937 !important;
+}
+
+.event-result .fc-event-title,
+.event-result .fc-event-main,
+.event-result .fc-event-main-frame {
+  color: #1f2937 !important;
+}
+
+.event-result:hover {
+  background-color: #a8bf44 !important;
+  border-color: #a8bf44 !important;
+}
+
+/* 슬라이드 인 */
+@keyframes slideIn {
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slideIn {
+  animation: slideIn 0.25s ease;
 }

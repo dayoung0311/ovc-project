@@ -1,57 +1,72 @@
+import { motion } from "framer-motion"
+
 function SectionCalendar() {
-
   return (
-    <section className="py-32 bg-white">
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-b from-primarySoft to-white">
 
-      <div className="max-w-6xl mx-auto px-6 text-center">
+      <div className="relative max-w-[1400px] mx-auto px-10 lg:px-20 w-full grid lg:grid-cols-[1.1fr_1fr] gap-24 items-center">
+        
+        <motion.div
+          initial={{ opacity: 0, x: -60, y: 20 }}
+          whileInView={{ opacity: 1, x: 0, y: 0 }}
+          transition={{ duration: 0.85, ease: "easeOut" }}
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <p className="text-primary font-semibold mb-4 tracking-wide">
+            일정 생성 · 관리
+          </p>
 
-        <p className="text-primary font-semibold mb-2">
-          Desk Research
-        </p>
+          <h2 className="text-4xl lg:text-5xl font-bold mb-8 text-gray-900 leading-tight">
+            자격증 일정 관리
+          </h2>
 
-        <h2 className="text-3xl font-bold mb-12">
-          자격증 준비 트렌드
-        </h2>
+          <h3 className="text-2xl lg:text-3xl font-bold mb-8 text-gray-800 leading-snug">
+            모든 자격증 시험 일정을
+            <br />
+            캘린더에서 한눈에
+          </h3>
 
-        <div className="grid md:grid-cols-3 gap-8">
+          <p className="text-gray-600 text-base lg:text-lg max-w-lg mb-10 leading-8">
+            시험 접수일, 시험일, 결과 발표일까지 자격증 일정을 자동으로 정리합니다.
+            <br />
+            여러 자격증 시험 일정을 캘린더에서 한 번에 확인하세요.
+          </p>
 
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h3 className="font-semibold mb-4">
-              MARKET TREND
-            </h3>
+          <motion.button
+            whileHover={{ scale: 1.04, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+            className="bg-primary text-lg lg:text-xl text-white px-16 sm:px-24 lg:px-32 py-5 lg:py-6 rounded-full shadow-lg shadow-primary/20 transition"
+          >
+            일정 보러가기
+          </motion.button>
+        </motion.div>
 
-            <p className="text-gray-500 text-sm">
-              자격증 시장 규모 증가
-            </p>
+        <motion.div
+          initial={{ opacity: 0, x: 60, y: 20 }}
+          whileInView={{ opacity: 1, x: 0, y: 0 }}
+          transition={{ duration: 0.9, ease: "easeOut", delay: 0.1 }}
+          viewport={{ once: true, amount: 0.3 }}
+          whileHover={{ y: -6 }}
+          className="relative rounded-3xl border border-white/60 bg-white/80 backdrop-blur-sm shadow-xl shadow-primary/10 p-6 lg:p-7 transition"
+        >
+          {/* 카드 상단 느낌 */}
+          <div className="mb-4 flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-primary/40" />
+            <span className="w-3 h-3 rounded-full bg-primary/25" />
+            <span className="w-3 h-3 rounded-full bg-primary/15" />
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h3 className="font-semibold mb-4">
-              LIFE TREND
-            </h3>
-
-            <p className="text-gray-500 text-sm">
-              새로운 학습 방식 증가
-            </p>
+          <div className="rounded-2xl overflow-hidden border border-primary/10 bg-white">
+            <img
+              src="/calendar.png"
+              alt="캘린더 미리보기"
+              className="w-full rounded-2xl object-cover"
+            />
           </div>
-
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h3 className="font-semibold mb-4">
-              CONSUMER TREND
-            </h3>
-
-            <p className="text-gray-500 text-sm">
-              MZ세대 자기개발 관심 증가
-            </p>
-          </div>
-
-        </div>
-
+        </motion.div>
       </div>
-
     </section>
   )
-
 }
 
 export default SectionCalendar

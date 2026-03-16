@@ -165,68 +165,99 @@ function CalendarPage() {
 
             {/* 우측 상세 */}
             {selectedEvent && (
+                <div className="w-[420px] min-h-screen bg-[#FFF9EC] border-l border-[#ECE7D8] p-8 animate-slideIn relative">
+                    {/* 닫기 버튼 */}
+                    <button
+                        onClick={() => setSelectedEvent(null)}
+                        className="absolute top-6 right-6 text-[#6B7280] hover:text-[#1A0089] transition p-2 rounded-full hover:bg-[#FFF3D6]"
+                    >
+                        <IoCloseSharp size={22} />
+                    </button>
 
-                <div className="flex w-[400px] h-screen bg-green-100">
+                    {/* 상단 제목 영역 */}
+                    {selectedSchedule && (
+                        <div className="pb-6 border-b border-[#ECE7D8]">
+                            <div className="pr-10">
+                                <p className="inline-flex items-center rounded-full bg-[#B8CE52] px-4 py-1.5 text-sm font-semibold text-[#1A0089]">
+                                    {selectedSchedule.eventType}
+                                </p>
 
-                    <div>
+                                <h1 className="mt-4 text-[32px] font-bold leading-tight text-[#0F172A] break-keep">
+                                    {selectedSchedule.certificateName}
+                                </h1>
 
-                        {selectedSchedule ? (
+                                <div className="mt-4 h-[4px] w-[120px] rounded-full bg-[#1A0089]" />
 
-                            <div>
+                                <div className="mt-5 flex flex-wrap gap-2">
+                                    <span className="rounded-full border border-[#E7DAB7] bg-[#FFF3D6] px-3 py-1 text-sm font-medium text-[#6B5520]">
+                                        시험 종류 · {selectedSchedule.examType}
+                                    </span>
 
-                                <h1>{selectedSchedule.certificateName}</h1>
-
-                                <p>시험 종류 : {selectedSchedule.examType}</p>
-
-                                <p>일정 유형 : {selectedSchedule.eventType}</p>
-
-                                <p>전체 시험 일정</p>
+                                    <span className="rounded-full border border-[#E7DAB7] bg-white px-3 py-1 text-sm font-medium text-[#1A0089]">
+                                        일정 유형 · {selectedSchedule.eventType}
+                                    </span>
+                                </div>
 
                                 <button
-                                    className="border border-black-200"
                                     onClick={handleOpenScheduleModal}
+                                    className="mt-6 w-full h-[52px] rounded-xl bg-[#FE5E32] text-white font-semibold hover:bg-[#E9552C] transition"
                                 >
-                                    일정 상세 보기
+                                    전체 시험 일정 보기
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 시험 정보 */}
+                    {certificate && (
+                        <div className="pt-6 pb-6 border-b border-[#ECE7D8]">
+                            <h2 className="text-lg font-semibold text-[#1A0089]">
+                                시험 정보
+                            </h2>
+
+                            <div className="mt-4 rounded-2xl border border-[#E7DAB7] bg-white p-5 flex flex-col gap-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium text-gray-500">필기 응시료</span>
+                                    <span className="text-base font-semibold text-[#0F172A]">
+                                        {certificate.writtenFee || "-"}
+                                    </span>
+                                </div>
+
+                                <div className="h-px bg-[#F1E7CD]" />
+
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium text-gray-500">실기 응시료</span>
+                                    <span className="text-base font-semibold text-[#0F172A]">
+                                        {certificate.practicalFee || "-"}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 상세 정보 */}
+                    {certificate && (
+                        <div className="pt-6">
+                            <h2 className="text-lg font-semibold text-[#1A0089]">
+                                상세 정보
+                            </h2>
+
+                            <div className="mt-4 flex flex-wrap gap-3">
+                                <button className="px-4 py-2.5 text-sm rounded-full bg-[#FFF3D6] border border-[#E7DAB7] text-[#6B5520] font-medium hover:bg-[#F7E8C2] transition">
+                                    유의 사항
                                 </button>
 
+                                <button className="px-4 py-2.5 text-sm rounded-full bg-white border border-[#B8CE52] text-[#1A0089] font-medium hover:bg-[#F8FBEF] transition">
+                                    출제 경향
+                                </button>
+
+                                <button className="px-4 py-2.5 text-sm rounded-full bg-[#1A0089] text-white font-medium hover:bg-[#14006d] transition">
+                                    취득 방법
+                                </button>
                             </div>
-
-                        ) : (
-
-                            <p>일정을 선택하세요.</p>
-
-                        )}
-
-                        {certificate && (
-
-                            <div>
-
-                                <p>시험 정보</p>
-
-                                <p>필기 응시료: {certificate.writtenFee}</p>
-
-                                <p>실기 응시료: {certificate.practicalFee}</p>
-
-                                <p>상세 정보</p>
-
-                                <button className="border border-black-200">유의 사항</button>
-                                <button className="border border-black-200">출제 경향</button>
-                                <button className="border border-black-200">취득 방법</button>
-
-                            </div>
-
-                        )}
-
-                    </div>
-
-                    <div>
-                        <button onClick={() => setSelectedEvent(null)}>
-                            <IoCloseSharp />
-                        </button>
-                    </div>
-
+                        </div>
+                    )}
                 </div>
-
             )}
 
             <CertScheduleDetailModal
