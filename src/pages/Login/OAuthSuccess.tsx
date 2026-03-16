@@ -1,25 +1,30 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 
 function OAuthSuccess() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        console.log("URL:", window.location.search);
-        const token = params.get("token");
-        console.log("token:", token);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
 
-        if (token) {
-            localStorage.setItem("accessToken", token);
-            console.log("로그인 직후 token:", localStorage.getItem("accessToken"));
-            setTimeout(() => {
-                navigate("/mypage");
-            }, 0);
-        }
-    }, []);
+    console.log("URL:", window.location.search);
+    const accessToken = params.get("accessToken"); 
 
-    return <div>처리 중...</div>
+    console.log("token:", accessToken);
+
+    if (accessToken) {
+      localStorage.setItem("accessToken", accessToken);
+
+      console.log(
+        "로그인 직후 token:",
+        localStorage.getItem("accessToken")
+      );
+
+      navigate("/mypage");
+    }
+  }, []);
+
+  return <div>처리 중...</div>;
 }
 
-export default OAuthSuccess
+export default OAuthSuccess;

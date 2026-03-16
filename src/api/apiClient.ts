@@ -6,7 +6,7 @@ export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 5000,
   withCredentials: true,
-    headers: {
+  headers: {
     "Content-Type": "application/json",
   },
 });
@@ -16,9 +16,9 @@ apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("accessToken");
 
   // auth 요청에는 토큰 붙이지 않음
-  if (token && !config.url?.includes("/auth")) {
+  if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
   return config;
-})
+});

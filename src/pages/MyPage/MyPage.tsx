@@ -1,11 +1,31 @@
 import { useQuery } from "@tanstack/react-query";
 import { getMyInfo } from "../../api/user";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 function MyPage() {
-  const { data: user, isLoading, error } = useQuery({
+  const navigate = useNavigate();
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const accessToken = params.get("accessToken");
+
+    if (accessToken) {
+      localStorage.setItem("accessToken", accessToken);
+      navigate("/mypage", { replace: true });
+    }
+
+    setReady(true);
+  }, [navigate]);
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["myInfo"],
     queryFn: getMyInfo,
-    retry: false,
+    retry: ready,
   });
 
   if (isLoading) {
@@ -19,7 +39,9 @@ function MyPage() {
   if (error) {
     return (
       <div className="min-h-screen px-6 pt-28">
-        <div className="mx-auto max-w-[1400px] text-gray-500">로그인이 필요합니다.</div>
+        <div className="mx-auto max-w-[1400px] text-gray-500">
+          로그인이 필요합니다.
+        </div>
       </div>
     );
   }
