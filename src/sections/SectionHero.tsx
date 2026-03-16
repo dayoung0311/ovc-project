@@ -2,7 +2,7 @@ import { motion } from "framer-motion"
 
 function SectionHero() {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-b from-white via-primarySoft/40 to-primarySoft">
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-b from-white via-primarySoft/40 to-primarySoft mt-[-30px]">
 
       <div className="relative max-w-[1400px] mx-auto px-10 lg:px-20 w-full">
         <motion.p
@@ -42,13 +42,6 @@ function SectionHero() {
           transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
           className="flex gap-4"
         >
-          <motion.button
-            whileHover={{ scale: 1.04, y: -2 }}
-            whileTap={{ scale: 0.98 }}
-            className="bg-primary text-xl text-white px-16 sm:px-24 lg:px-32 py-5 lg:py-6 rounded-full shadow-lg shadow-primary/20 transition"
-          >
-            시작하기
-          </motion.button>
         </motion.div>
       </div>
 

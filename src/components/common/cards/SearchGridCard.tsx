@@ -36,46 +36,48 @@ function SearchGridCard({
   });
 
   return (
-    <div className="w-full h-full rounded-[28px] border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition">
+    <div className="group flex h-full w-full flex-col overflow-hidden rounded-[30px] border border-white/70 bg-white/72 shadow-[0_12px_36px_rgba(15,23,42,0.06)] backdrop-blur-xl transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_18px_46px_rgba(15,23,42,0.10)]">
       {/* 상단 */}
-      <div className="px-6 pt-6 pb-4 flex items-start justify-between">
-        <span className="inline-flex items-center rounded-full border border-[#B8CE52] bg-[#B8CE52] px-3 py-1 text-sm font-semibold text-[#1A0089]">
+      <div className="px-6 pt-6">
+        <span className="inline-flex items-center rounded-full border border-primary/10 bg-primarySoft/70 px-4 py-2 text-xs font-semibold tracking-tight text-grayshadow-sm">
           {category}
         </span>
       </div>
 
       {/* 본문 */}
-      <div className="px-6 pb-6 min-h-[220px] flex flex-col">
-        <h3 className="text-[30px] font-bold text-gray-900 leading-[1.2] break-keep">
+      <div className="flex min-h-[240px] flex-1 flex-col px-6 pb-6 pt-5">
+        <h3 className="break-keep text-[30px] font-bold leading-[1.2] tracking-tight text-gray-900">
           {title}
         </h3>
 
-        <div className="mt-4 h-[2px] w-21 rounded-full bg-[#1A0089]" />
+        <div className="mt-4 h-[1px] w-42 rounded-full bg-black" />
 
-        <p className="mt-5 text-[15px] leading-7 text-gray-500 break-keep">
+        <p className="mt-5 line-clamp-4 break-keep text-[15px] leading-7 text-gray-500">
           {description}
         </p>
       </div>
 
       {/* 하단 */}
-      <div className="border-t border-[#f1e5c8] bg-[#fffaf0] px-6 py-5 flex justify-end gap-3">
-        <button
-          onClick={() => {
-            addFavoriteMutation.mutate();
-          }}
-          className="w-[160px] h-[50px] rounded-xl border border-[#eadcb7] bg-[#FFF3D6] text-[#5b4a1f] font-semibold hover:bg-[#f8e8c4] transition"
-        >
-          내 찜에 추가
-        </button>
+      <div className="border-t border-white/70 bg-white/35 px-6 py-5 backdrop-blur-md">
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={() => {
+              addFavoriteMutation.mutate();
+            }}
+            className="h-[50px] w-[160px] rounded-full border border-primary/10 bg-primarySoft/65 text-sm font-semibold text-gray-800 transition hover:bg-primarySoft disabled:opacity-60"
+          >
+            내 찜에 추가
+          </button>
 
-        <button
-          onClick={() => {
-            onScheduleClick?.();
-          }}
-          className="w-[160px] h-[50px] rounded-xl bg-[#FE5E32] text-white font-semibold hover:bg-[#e45127] transition"
-        >
-          일정 보기
-        </button>
+          <button
+            onClick={() => {
+              onScheduleClick?.();
+            }}
+            className="h-[50px] w-[160px] rounded-full bg-gray-900 text-sm font-semibold text-white transition hover:bg-primaryDark"
+          >
+            일정 보기
+          </button>
+        </div>
       </div>
     </div>
   );

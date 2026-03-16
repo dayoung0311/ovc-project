@@ -1,4 +1,4 @@
-import FullCalendar from "@fullcalendar/react"
+import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import { useMemo, useState, useCallback } from "react";
 import { type Certificate, type Schedule } from "../../types/exam";
@@ -7,86 +7,59 @@ import { mapSchedulesToEvents } from "../../utils/calendar";
 import type { EventApi, EventClickArg, EventContentArg } from "@fullcalendar/core";
 import { getCertificates } from "../../api/certificate";
 import { IoCloseSharp } from "react-icons/io5";
-import './calendar.css'
+import "./calendar.css";
 import { useQuery } from "@tanstack/react-query";
 import CertScheduleDetailModal from "../../components/common/modal/CertScheduleDetailModal";
 import { Search } from "lucide-react";
 
-
 function CalendarPage() {
-
     const today = new Date();
 
-    // 캘린더 기준 날짜 (월 이동 시 변경)
     const [currentDate, setCurrentDate] = useState(today);
-
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth() + 1;
 
-    // 클릭한 이벤트
     const [selectedEvent, setSelectedEvent] = useState<EventApi | null>(null);
-
-    // 클릭한 일정 데이터
     const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
-
-    // 자격증 정보
     const [certificate, setCertificate] = useState<Certificate | null>(null);
 
-    // 모달
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-    //일정 상세조회 버튼 클릭 시 모달 전체 일정 조회를 위한 state
     const [certSchedules, setCertSchedules] = useState<Schedule[]>([]);
 
-
-    //검색창에 입력하는 값
     const [searchInput, setSearchInput] = useState("");
 
-    // 일정 API 호출
     const { data: schedules = [], isLoading, error } = useQuery({
         queryKey: ["schedules", year, month],
-        queryFn: () => getSchedules(year, month)
+        queryFn: () => getSchedules(year, month),
     });
 
-    //schedules 또는 searchInput이 바뀌면 자동으로 필터 다시 계산
     const filteredSchedules = useMemo(() => {
         if (!searchInput.trim()) return schedules;
 
         return schedules.filter((schedule) =>
-            //자격증 이름에 검색어가 포함되어 있으면 일정을 유지함 
-            schedule.certificateName
-                .toLowerCase()
-                .includes(searchInput.toLowerCase())
+            schedule.certificateName.toLowerCase().includes(searchInput.toLowerCase())
         );
-    }, [schedules, searchInput])
+    }, [schedules, searchInput]);
 
-    // FullCalendar 이벤트 변환
     const events = useMemo(() => {
         return mapSchedulesToEvents(filteredSchedules);
     }, [filteredSchedules]);
 
-    // 일정 클릭
     const handleEventClick = useCallback(async (info: EventClickArg) => {
-
         const props = info.event.extendedProps as Schedule;
 
         try {
-
             const certData = await getCertificates(props.certId);
 
             setCertificate(certData);
             setSelectedSchedule(props);
             setSelectedEvent(info.event);
-
         } catch (error) {
             console.error("자격증 정보 불러오기 실패", error);
         }
-
     }, []);
 
-    // 이벤트 색상
     const handleEventClassNames = useCallback((arg: EventContentArg) => {
-
         const type = arg.event.extendedProps.eventType;
 
         if (type === "APPLY") return ["event-apply"];
@@ -94,180 +67,248 @@ function CalendarPage() {
         if (type === "RESULT") return ["event-result"];
 
         return [];
-
     }, []);
 
-    // 모달용 일정
     const handleOpenScheduleModal = async () => {
         if (!selectedSchedule) return;
 
-        console.log("selectedSchedule:", selectedSchedule);
-        console.log("certId:", selectedSchedule?.certId);
-
         try {
-            const data = await getSchedulesByCertificate(
-                selectedSchedule.certId,
-                year
-            );
+            const data = await getSchedulesByCertificate(selectedSchedule.certId, year);
             setCertSchedules(data);
-
             setIsModalOpen(true);
         } catch (error) {
             console.log("자격증 전체 일정 불러오기 실패", error);
             throw error;
         }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-[#fcfcfb] via-[#f8f8f6] to-[#f2f5f1] px-6 pb-12 pt-16">
+                <div className="mx-auto max-w-[1440px] rounded-[32px] border border-white/70 bg-white/45 p-10 text-center text-gray-500 shadow-[0_10px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl">
+                    일정을 불러오는 중...
+                </div>
+            </div>
+        );
     }
 
-    if (isLoading) return <div>일정을 불러오는 중...</div>
-    if (error) return <div>일정 데이터를 불러오는데 실패했습니다.</div>
+    if (error) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-[#fcfcfb] via-[#f8f8f6] to-[#f2f5f1] px-6 pb-12 pt-16">
+                <div className="mx-auto max-w-[1440px] rounded-[32px] border border-white/70 bg-white/45 p-10 text-center text-red-500 shadow-[0_10px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl">
+                    일정 데이터를 불러오는데 실패했습니다.
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="flex">
-            {/* 캘린더 */}
-            <div className="flex-1 p-[40px] flex flex-col gap-4">
+        <div className="min-h-screen bg-gradient-to-b from-[#fcfcfb] via-[#f8f8f6] to-[#f2f5f1] px-6 pb-12 pt-16">
+            <div className="mx-auto w-full max-w-[1440px]">
+                {/* 상단 소개 영역 */}
+                <section className="mb-4 rounded-[32px] border border-white/70 bg-white/45 p-8 shadow-[0_10px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl">
+                    <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                        <div>
+                            <p className="mb-3 text-sm font-semibold tracking-[0.18em] text-black">
+                                CALENDAR
+                            </p>
+                            <h1 className="mb-2 text-4xl font-bold tracking-tight text-gray-900">
+                                자격증 일정 관리
+                            </h1>
+                            <p className="max-w-2xl text-base leading-7 text-gray-500">
+                                접수일, 시험일, 결과 발표일까지 자격증 일정을 한눈에 확인하고
+                                필요한 시험 정보를 빠르게 탐색하세요.
+                            </p>
+                        </div>
 
-                {/* 검색창 */}
-                <div className="flex justify-end">
-                    <div className="flex w-[300px] border border-gray-300 rounded-lg px-3 py-2 items-center gap-2">
-                        <input
-                            className="flex-1 outline-none"
-                            type="text"
-                            placeholder="일정 검색..."
-                            value={searchInput}
-                            onChange={(e) => setSearchInput(e.target.value)}
-                        />
-                        <Search size={18} />
+                        <div className="inline-flex rounded-full border border-primary/10 bg-primarySoft/55 px-4 py-2 text-sm font-semibold text-gray">
+                            {year}년 {month}월 일정
+                        </div>
                     </div>
-                </div>
+                </section>
 
-                <FullCalendar
-                    plugins={[dayGridPlugin]}
-                    initialView="dayGridMonth"
-                    initialDate={currentDate}
-                    events={events}
-                    eventClick={handleEventClick}
-                    eventClassNames={handleEventClassNames}
-                    datesSet={(info) => {
-                        const date = info.view.currentStart;
-                        setCurrentDate(date);
-                    }}
-                    height="auto"
-                    displayEventTime={false}
-                    eventDisplay="block"
-                    headerToolbar={{
-                        left: "",
-                        center: "prev title next",
-                        right: "today"
-                    }}
-                />
-
-            </div>
-
-            {/* 우측 상세 */}
-            {selectedEvent && (
-                <div className="w-[420px] min-h-screen bg-[#FFF9EC] border-l border-[#ECE7D8] p-8 animate-slideIn relative">
-                    {/* 닫기 버튼 */}
-                    <button
-                        onClick={() => setSelectedEvent(null)}
-                        className="absolute top-6 right-6 text-[#6B7280] hover:text-[#1A0089] transition p-2 rounded-full hover:bg-[#FFF3D6]"
-                    >
-                        <IoCloseSharp size={22} />
-                    </button>
-
-                    {/* 상단 제목 영역 */}
-                    {selectedSchedule && (
-                        <div className="pb-6 border-b border-[#ECE7D8]">
-                            <div className="pr-10">
-                                <p className="inline-flex items-center rounded-full bg-[#B8CE52] px-4 py-1.5 text-sm font-semibold text-[#1A0089]">
-                                    {selectedSchedule.eventType}
+                {/* 메인 영역 */}
+                <div className={`grid gap-8 ${selectedEvent && selectedSchedule
+                        ? "grid-cols-1 xl:grid-cols-[minmax(0,1fr)_380px]"
+                        : "grid-cols-1"
+                    }`}>
+                    {/* 캘린더 영역 */}
+                    <section className="rounded-[32px] border border-white/70 bg-white/40 p-6 shadow-[0_10px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl">
+                        {/* 상단 필터 */}
+                        <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                            <div>
+                                <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+                                    월간 캘린더
+                                </h2>
+                                <p className="mt-2 text-sm leading-6 text-gray-500">
+                                    자격증 이름으로 검색해서 원하는 일정만 빠르게 확인할 수 있어요.
                                 </p>
+                            </div>
 
-                                <h1 className="mt-4 text-[32px] font-bold leading-tight text-[#0F172A] break-keep">
-                                    {selectedSchedule.certificateName}
-                                </h1>
-
-                                <div className="mt-4 h-[4px] w-[120px] rounded-full bg-[#1A0089]" />
-
-                                <div className="mt-5 flex flex-wrap gap-2">
-                                    <span className="rounded-full border border-[#E7DAB7] bg-[#FFF3D6] px-3 py-1 text-sm font-medium text-[#6B5520]">
-                                        시험 종류 · {selectedSchedule.examType}
-                                    </span>
-
-                                    <span className="rounded-full border border-[#E7DAB7] bg-white px-3 py-1 text-sm font-medium text-[#1A0089]">
-                                        일정 유형 · {selectedSchedule.eventType}
-                                    </span>
-                                </div>
-
-                                <button
-                                    onClick={handleOpenScheduleModal}
-                                    className="mt-6 w-full h-[52px] rounded-xl bg-[#FE5E32] text-white font-semibold hover:bg-[#E9552C] transition"
-                                >
-                                    전체 시험 일정 보기
-                                </button>
+                            <div className="flex w-full max-w-[360px] items-center gap-3 rounded-2xl border border-white/70 bg-white/70 px-4 py-3 shadow-[0_8px_30px_rgba(15,23,42,0.04)] backdrop-blur-xl">
+                                <Search size={18} className="text-gray-400" />
+                                <input
+                                    className="w-full bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
+                                    type="text"
+                                    placeholder="일정 검색..."
+                                    value={searchInput}
+                                    onChange={(e) => setSearchInput(e.target.value)}
+                                />
                             </div>
                         </div>
-                    )}
 
-                    {/* 시험 정보 */}
-                    {certificate && (
-                        <div className="pt-6 pb-6 border-b border-[#ECE7D8]">
-                            <h2 className="text-lg font-semibold text-[#1A0089]">
-                                시험 정보
-                            </h2>
-
-                            <div className="mt-4 rounded-2xl border border-[#E7DAB7] bg-white p-5 flex flex-col gap-4">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm font-medium text-gray-500">필기 응시료</span>
-                                    <span className="text-base font-semibold text-[#0F172A]">
-                                        {certificate.writtenFee || "-"}
-                                    </span>
-                                </div>
-
-                                <div className="h-px bg-[#F1E7CD]" />
-
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm font-medium text-gray-500">실기 응시료</span>
-                                    <span className="text-base font-semibold text-[#0F172A]">
-                                        {certificate.practicalFee || "-"}
-                                    </span>
-                                </div>
-                            </div>
+                        <div className="calendar-shell rounded-[28px] border border-white/70 bg-white/60 p-4 shadow-[0_8px_30px_rgba(15,23,42,0.04)] backdrop-blur-xl">
+                            <FullCalendar
+                                plugins={[dayGridPlugin]}
+                                initialView="dayGridMonth"
+                                initialDate={currentDate}
+                                events={events}
+                                eventClick={handleEventClick}
+                                eventClassNames={handleEventClassNames}
+                                datesSet={(info) => {
+                                    const date = info.view.currentStart;
+                                    setCurrentDate(date);
+                                }}
+                                height="auto"
+                                displayEventTime={false}
+                                eventDisplay="block"
+                                headerToolbar={{
+                                    left: "",
+                                    center: "prev title next",
+                                    right: "today",
+                                }}
+                            />
                         </div>
-                    )}
+                    </section>
 
-                    {/* 상세 정보 */}
-                    {certificate && (
-                        <div className="pt-6">
-                            <h2 className="text-lg font-semibold text-[#1A0089]">
-                                상세 정보
-                            </h2>
+                    {/* 우측 상세 패널 */}
+                    {selectedEvent && selectedSchedule && (
+                        <aside className="sticky top-60 h-fit min-h-[710px] rounded-[32px] border border-white/70 bg-white/45 p-6 shadow-[0_10px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl">
+                            {!selectedEvent || !selectedSchedule ? (
+                                <div className="flex min-h-[520px] flex-col justify-between">
+                                    <div>
+                                        <p className="mb-3 text-sm font-semibold tracking-[0.18em] text-primaryDark/80">
+                                            DETAILS
+                                        </p>
+                                        <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+                                            일정 상세 정보
+                                        </h2>
+                                        <p className="mt-3 text-sm leading-6 text-gray-500">
+                                            캘린더에서 일정을 클릭하면 시험 정보와 상세 내용을 여기서 볼 수 있어요.
+                                        </p>
+                                    </div>
 
-                            <div className="mt-4 flex flex-wrap gap-3">
-                                <button className="px-4 py-2.5 text-sm rounded-full bg-[#FFF3D6] border border-[#E7DAB7] text-[#6B5520] font-medium hover:bg-[#F7E8C2] transition">
-                                    유의 사항
-                                </button>
+                                    <div className="rounded-[28px] border border-dashed border-gray-200 bg-white/45 px-6 py-12 text-center">
+                                        <p className="text-base font-medium text-gray-700">
+                                            아직 선택된 일정이 없어요
+                                        </p>
+                                        <p className="mt-2 text-sm text-gray-500">
+                                            캘린더의 일정 카드를 눌러 상세 정보를 확인해보세요.
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="relative">
+                                    <button
+                                        onClick={() => {
+                                            setSelectedEvent(null);
+                                            setSelectedSchedule(null);
+                                            setCertificate(null);
+                                        }}
+                                        className="absolute right-0 top-0 flex h-10 w-10 items-center justify-center rounded-full bg-white/70 text-gray-500 transition hover:bg-white hover:text-gray-900"
+                                    >
+                                        <IoCloseSharp size={20} />
+                                    </button>
 
-                                <button className="px-4 py-2.5 text-sm rounded-full bg-white border border-[#B8CE52] text-[#1A0089] font-medium hover:bg-[#F8FBEF] transition">
-                                    출제 경향
-                                </button>
+                                    {/* 상단 제목 */}
+                                    <div className="border-b border-gray-200/70 pb-6 pr-12">
+                                        <p className="inline-flex items-center rounded-full border border-primary/10 bg-primarySoft/70 px-3 py-1 text-xs font-semibold text-gray shadow-sm">
+                                            {selectedSchedule.eventType}
+                                        </p>
 
-                                <button className="px-4 py-2.5 text-sm rounded-full bg-[#1A0089] text-white font-medium hover:bg-[#14006d] transition">
-                                    취득 방법
-                                </button>
-                            </div>
-                        </div>
+                                        <h2 className="mt-4 break-keep text-[30px] font-bold leading-tight tracking-tight text-gray-900">
+                                            {selectedSchedule.certificateName}
+                                        </h2>
+
+                                        <div className="mt-4 h-[1px] w-full rounded-full bg-black" />
+
+                                        <div className="mt-5 flex flex-wrap gap-2">
+                                            <span className="rounded-full border border-white/70 bg-white/75 px-3 py-1.5 text-base font-medium text-gray-700">
+                                                시험 종류 · {selectedSchedule.examType}
+                                            </span>
+
+                                           <span className="rounded-full border border-white/70 bg-white/75 px-3 py-1.5 text-base font-medium text-gray-700">
+                                                일정 유형 · {selectedSchedule.eventType}
+                                            </span>
+                                        </div>
+
+                                        <button
+                                            onClick={handleOpenScheduleModal}
+                                            className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-gray-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-primaryDark"
+                                        >
+                                            전체 시험 일정 보기
+                                        </button>
+                                    </div>
+
+                                    {/* 시험 정보 */}
+                                    {certificate && (
+                                        <div className="border-b border-gray-200/70 py-6">
+                                            <h3 className="text-lg font-semibold text-gray-900">시험 정보</h3>
+
+                                            <div className="mt-4 rounded-[24px] border border-white/70 bg-white/60 p-5 shadow-[0_8px_24px_rgba(15,23,42,0.03)] backdrop-blur-md">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-sm font-medium text-gray-500">필기 응시료</span>
+                                                    <span className="text-base font-semibold text-gray-900">
+                                                        {certificate.writtenFee || "-"}
+                                                    </span>
+                                                </div>
+
+                                                <div className="my-4 h-px bg-gray-200/80" />
+
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-sm font-medium text-gray-500">실기 응시료</span>
+                                                    <span className="text-base font-semibold text-gray-900">
+                                                        {certificate.practicalFee || "-"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* 상세 정보 */}
+                                    {certificate && (
+                                        <div className="pt-6">
+                                            <h3 className="text-lg font-semibold text-gray-900">상세 정보</h3>
+
+                                            <div className="mt-4 flex flex-wrap gap-3">
+                                                <button className="rounded-full border border-black px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-white">
+                                                    유의 사항
+                                                </button>
+
+                                                 <button className="rounded-full border border-black px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-white">
+                                                    출제 경향
+                                                </button>
+
+                                                 <button className="rounded-full border border-black px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-white">
+                                                    취득 방법
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </aside>
                     )}
                 </div>
-            )}
 
-            <CertScheduleDetailModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                schedules={certSchedules}
-            />
-
+                <CertScheduleDetailModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    schedules={certSchedules}
+                />
+            </div>
         </div>
-    )
+    );
 }
 
-export default CalendarPage
+export default CalendarPage;

@@ -5,7 +5,6 @@ import MyCertCard from "../../components/common/cards/MyCertCard";
 import MyWishlistCard, {
   WISHLIST_CARD_TYPE,
 } from "../../components/common/cards/MyWishlistCard";
-import { Award, Bookmark } from "lucide-react";
 import Modal from "../../components/common/modal/Modal";
 import CertRegisterForm, {
   type CertRegisterFormValues,
@@ -40,10 +39,9 @@ function CertManage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const queryClient = useQueryClient();
 
-  //찜 목록 데이터를 가져옴
-  const {data: favorites = [] } = useQuery({
+  const { data: favorites = [] } = useQuery({
     queryKey: ["favorites"],
-    queryFn: getFavorites
+    queryFn: getFavorites,
   });
 
   const {
@@ -53,11 +51,8 @@ function CertManage() {
   } = useQuery({
     queryKey: ["myCerts"],
     queryFn: getMyCerts,
-    // 토큰 조건으로 조회를 제한하려면 enabled 옵션을 다시 활성화하면 된다.
-    retry: false, // 인증 이슈 시 과도한 재시도 방지
+    retry: false,
   });
-
-  console.log("favorites 데이터:", favorites);
 
   const certList = myCerts.map(mapMyCertResponse);
 
@@ -79,6 +74,7 @@ function CertManage() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["myCerts"] });
+      setIsModalOpen(false);
     },
   });
 
@@ -96,7 +92,6 @@ function CertManage() {
       if (error instanceof Error && error.message === "CERT_NOT_SELECTED") {
         alert("자격증을 목록에서 선택해주세요.");
       } else if (isAxiosError(error) && error.response?.status === 409) {
-        // 409(중복 등록)은 실패가 아니라 이미 완료된 상태로 간주
         await queryClient.invalidateQueries({ queryKey: ["myCerts"] });
         alert("이미 등록된 자격증입니다. 등록 완료 상태로 처리됩니다.");
         return;
@@ -117,87 +112,175 @@ function CertManage() {
   };
 
   const deleteFavoriteMutation = useMutation({
-  mutationFn: (certId: number) => deleteFavorite(certId),
-
-  onSuccess: async () => {
-    await queryClient.invalidateQueries({ queryKey: ["favorites"] });
-  }
-});
+    mutationFn: (certId: number) => deleteFavorite(certId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["favorites"] });
+    },
+  });
 
   return (
-    <div className="p-10">
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="mb-2 text-4xl font-bold">자격증 관리</h1>
-          <p className="mb-8 text-gray-500">
-            전문적인 성과를 관리하고 향후 학습 목표를 추적하세요.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          className="rounded-xl bg-green-700 px-4 py-2 font-semibold text-white"
-          onClick={() => setIsModalOpen(true)}
-        >
-          내 자격증 등록
-        </button>
-      </div>
-
-      <div className="flex w-full gap-6">
-        <section className="w-[40%] rounded-2xl bg-[#F6F7F7] p-4 shadow-sm">
-          <div className="mb-4 flex items-start justify-between">
-            <div className="flex items-center gap-2">
-              <Award className="h-5 w-5" />
-              <p className="font-semibold">취득한 자격증</p>
+    <div className="min-h-screen bg-gradient-to-b from-[#fcfcfb] via-[#f8f8f6] to-[#f2f5f1] px-6 pb-12 pt-16">
+      <div className="mx-auto w-full max-w-[1440px]">
+        {/* 상단 헤더 영역 */}
+        <section className="mb-6 rounded-[32px] border border-white/70 bg-white/45 p-8 shadow-[0_10px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="mb-3 text-sm font-semibold tracking-[0.18em] text-gray">
+                MY CERTIFICATIONS
+              </p>
+              <h1 className="mb-2 text-4xl font-bold tracking-tight text-gray-900">
+                자격증 관리
+              </h1>
+              <p className="max-w-2xl text-base leading-7 text-gray-500">
+                취득한 자격증과 관심 자격증을 한 곳에서 정리하고,
+                학습 목표와 준비 현황을 체계적으로 관리하세요.
+              </p>
             </div>
-            <div className="rounded-xl bg-gray-300 px-3 py-1 text-sm text-gray-600">
-              {certList.length}개 취득 완료
-            </div>
-          </div>
 
-          {isLoading ? (
-            <p className="text-sm text-gray-500">자격증 목록을 불러오는 중입니다...</p>
-          ) : isError ? (
-            <p className="text-sm text-red-500">자격증 목록 조회에 실패했습니다.</p>
-          ) : (
-            <div className="space-y-4">
-              {certList.map((cert, index) => (
-                <MyCertCard
-                  key={`${cert.id}-${cert.certNum ?? "no-cert-num"}-${cert.passingDate}-${index}`}
-                  name={cert.name}
-                  authority={cert.authority}
-                  certNum={cert.certNum || "-"}
-                  passingDate={cert.passingDate}
-                  expirationDate={cert.expirationDate || "-"}
-                  onDelete={() => void handleDeleteCert(cert)}
-                />
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="w-[60%] rounded-2xl bg-[#F6F7F7] p-4 shadow-sm">
-          <div className="mb-4 flex items-start justify-between">
-            <div className="flex items-center gap-2">
-              <Bookmark className="h-5 w-5" />
-              <p className="font-semibold">내 찜 목록</p>
-            </div>
-          </div>
-          <div className="flex justify-center"></div>
-          <div className="grid grid-cols-2 gap-6 mx-auto max-w-[1000px]">
-            {favorites.map((item) => (
-              <MyWishlistCard
-              key={item.certId}
-              type={WISHLIST_CARD_TYPE.APPLY}
-              title={item.title}
-              startDate={item.startDate}
-              endDate={item.endDate}
-              onDelete={() => deleteFavoriteMutation.mutate(item.certId)}
-              />
-            ))}
+            <button
+              type="button"
+              className="inline-flex h-fit items-center justify-center rounded-full bg-gray-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-primaryDark"
+              onClick={() => setIsModalOpen(true)}
+            >
+              내 자격증 등록
+            </button>
           </div>
         </section>
+
+        {/* 통계 요약 */}
+        <section className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="flex rounded-[28px] h-[100px] justify-between border border-white/70 bg-white/55 p-6 shadow-[0_8px_30px_rgba(15,23,42,0.04)] backdrop-blur-xl">
+            <div>
+              <p className="text-lg font-bold text-gray-500 mr-4">취득한 자격증</p>
+              <p className="text-sm text-gray-500">등록된 자격증 수</p>
+            </div>
+            <p className="text-3xl font-bold tracking-tight text-gray-900 pt-1 pr-3">
+              {certList.length}
+            </p>
+          </div>
+
+          <div className="flex rounded-[28px] h-[100px] justify-between border border-white/70 bg-white/55 p-6 shadow-[0_8px_30px_rgba(15,23,42,0.04)] backdrop-blur-xl">
+            <div>
+              <p className="text-lg font-bold text-gray-500 mr-4">취득한 자격증</p>
+              <p className="text-sm text-gray-500">등록된 자격증 수</p>
+            </div>
+            <p className="text-3xl font-bold tracking-tight text-gray-900 pt-1 pr-3">
+              {favorites.length}
+            </p>
+          </div>
+        </section>
+
+        {/* 본문 2단 */}
+        <section className="grid grid-cols-1 gap-8 xl:grid-cols-[1.05fr_1.15fr]">
+          {/* 취득한 자격증 */}
+          <div className="h-full rounded-[32px] border border-white/70 bg-white/40 p-6 shadow-[0_10px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl">
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="mb-2 text-sm font-semibold tracking-[0.14em] text-gray">
+                  ACQUIRED
+                </p>
+                <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+                  취득한 자격증
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-gray-500">
+                  이미 취득한 자격증의 발급기관, 취득일, 만료일을 확인할 수 있습니다.
+                </p>
+              </div>
+
+              <div className="inline-flex rounded-full border border-primary/10 bg-primarySoft/55 px-4 py-2 text-sm font-semibold text-gray">
+                {certList.length}개 취득 완료
+              </div>
+            </div>
+
+            {isLoading ? (
+              <div className="rounded-[24px] border border-white/70 bg-white/55 px-5 py-10 text-center text-sm text-gray-500">
+                자격증 목록을 불러오는 중입니다...
+              </div>
+            ) : isError ? (
+              <div className="rounded-[24px] border border-white/70 bg-white/55 px-5 py-10 text-center text-sm text-red-500">
+                자격증 목록 조회에 실패했습니다.
+              </div>
+            ) : certList.length === 0 ? (
+              <div className="rounded-[24px] border border-dashed border-gray-200 bg-white/45 px-5 py-12 text-center">
+                <p className="text-base font-medium text-gray-700">
+                  아직 등록된 자격증이 없어요
+                </p>
+                <p className="mt-2 text-sm text-gray-500">
+                  상단의 ‘내 자격증 등록’ 버튼으로 첫 자격증을 추가해보세요.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {certList.map((cert, index) => (
+                  <div
+                    key={`${cert.id}-${cert.certNum ?? "no-cert-num"}-${cert.passingDate}-${index}`}
+                    className="rounded-[26px] border border-white/70 bg-white/55 p-2 shadow-[0_8px_24px_rgba(15,23,42,0.03)] backdrop-blur-md"
+                  >
+                    <MyCertCard
+                      name={cert.name}
+                      authority={cert.authority}
+                      certNum={cert.certNum || "-"}
+                      passingDate={cert.passingDate}
+                      expirationDate={cert.expirationDate || "-"}
+                      onDelete={() => void handleDeleteCert(cert)}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* 찜 목록 */}
+          <div className="rounded-[32px] border border-white/70 bg-white/40 p-6 shadow-[0_10px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl">
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="mb-2 text-sm font-semibold tracking-[0.14em] text-gray">
+                  WISHLIST
+                </p>
+                <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+                  내 찜 목록
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-gray-500">
+                  관심 있는 자격증을 모아보고, 일정 확인과 준비 계획에 활용하세요.
+                </p>
+              </div>
+
+              <div className="inline-flex rounded-full border border-primary/10 bg-primarySoft/55 px-4 py-2 text-sm font-semibold text-gray">
+                {favorites.length}개 저장됨
+              </div>
+            </div>
+
+            {favorites.length === 0 ? (
+              <div className="rounded-[24px] border border-dashed border-gray-200 bg-white/45 px-5 py-12 text-center">
+                <p className="text-base font-medium text-gray-700">
+                  아직 찜한 자격증이 없어요
+                </p>
+                <p className="mt-2 text-sm text-gray-500">
+                  자격증 탐색 페이지에서 관심 자격증을 찜해보세요.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                {favorites.map((item) => (
+                  <div
+                    key={item.certId}
+                    className="rounded-[26px] border border-white/70 bg-white/55 p-2 shadow-[0_8px_24px_rgba(15,23,42,0.03)] backdrop-blur-md"
+                  >
+                    <MyWishlistCard
+                      type={WISHLIST_CARD_TYPE.APPLY}
+                      title={item.title}
+                      startDate={item.startDate}
+                      endDate={item.endDate}
+                      onDelete={() => deleteFavoriteMutation.mutate(item.certId)}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
       </div>
+
       <Modal
         isOpen={isModalOpen}
         title="자격증 등록"
