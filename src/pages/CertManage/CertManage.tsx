@@ -276,7 +276,7 @@ function CertManage() {
   });
 
   return (
-    <div className="min-h-screen px-6 pb-12 pt-30">
+    <div className="min-h-screen px-6 pb-18 pt-30">
       <div className="mx-auto w-full max-w-[1440px]">
         <section className="mb-6 p-8 h-full">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -332,7 +332,7 @@ function CertManage() {
                 자격증 목록 조회에 실패했습니다.
               </div>
             ) : certList.length === 0 ? (
-              <div className="rounded-[24px] border border-dashed border-gray-200 bg-white/45 px-5 py-12 text-center">
+              <div className="rounded-[24px] border border-dashed border-gray-200 bg-white/45 px-5 py-12 text-center mt-6">
                 <p className="text-base font-medium text-gray-700">
                   아직 등록된 자격증이 없어요
                 </p>
@@ -345,7 +345,6 @@ function CertManage() {
                 {certList.map((cert, index) => (
                   <div
                     key={`${cert.id}-${cert.certNum ?? "no-cert-num"}-${cert.passingDate}-${index}`}
-                    className="rounded-[26px] border border-white/70 bg-white/55 p-2 shadow-[0_8px_24px_rgba(15,23,42,0.03)] backdrop-blur-md"
                   >
                     <MyCertCard
                       name={cert.name}

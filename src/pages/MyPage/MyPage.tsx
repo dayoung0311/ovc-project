@@ -28,7 +28,7 @@ function MyPage() {
 
   return (
     <div className="min-h-screen text-gray-900">
-      <div className="mx-auto max-w-[1400px] px-6 pb-16 pt-28">
+      <div className="mx-auto max-w-[1400px] px-6 pb-16 pt-40">
         {/* 상단 타이틀 */}
         <section className="mb-8">
           <p className="mb-3 text-sm font-semibold tracking-[0.18em] text-black">
@@ -70,7 +70,7 @@ function MyPage() {
         <section className="w-full mt-10 gap-8">
           {/* 활동 요약 */}
           <div>
-            <h2 className="mb-4 text-[24px] font-semibold tracking-[-0.02em] text-gray-900">
+            <h2 className="mb-6 text-[24px] font-semibold tracking-[-0.02em] text-gray-900">
               활동 요약
             </h2>
 

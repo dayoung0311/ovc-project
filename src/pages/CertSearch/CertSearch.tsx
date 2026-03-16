@@ -88,7 +88,7 @@ function CertSearch() {
   };
 
   return (
-    <div className="min-h-screen px-6 pb-12 pt-30">
+    <div className="min-h-screen px-6 pb-16 pt-30">
       <div className="mx-auto w-full max-w-[1440px]">
         {/* 상단 영역 */}
         <section className="mb-4 p-8">
@@ -141,7 +141,7 @@ function CertSearch() {
             />
             <button
               onClick={handleSearch}
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-900 text-white transition hover:scale-105 hover:bg-primaryDark"
+              className="flex h-11 w-11 items-center justify-center rounded-full text-black transition hover:scale-105"
             >
               <Search size={18} />
             </button>
@@ -175,8 +175,8 @@ function CertSearch() {
                     <label
                       key={category.id}
                       className={`flex cursor-pointer items-center gap-3 rounded-full px-4 py-3 transition backdrop-blur-md ${isSelected
-                          ? "border border-white/70 bg-white/80 shadow-[0_8px_24px_rgba(15,23,42,0.06)]"
-                          : "border border-transparent bg-white/35 hover:border-white/60 hover:bg-white/55"
+                          ? "border border-white/70 shadow-[0_8px_24px_rgba(15,23,42,0.06)]"
+                          : "border border-transparent hover:border-white/60 hover:bg-white/55"
                         }`}
                     >
                       <input
