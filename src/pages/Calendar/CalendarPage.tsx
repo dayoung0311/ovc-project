@@ -27,19 +27,24 @@ function CalendarPage() {
     const [certSchedules, setCertSchedules] = useState<Schedule[]>([]);
 
     const [searchInput, setSearchInput] = useState("");
+    const [searchKeyword, setSearchKeyword] = useState("");
 
     const { data: schedules = [], isLoading, error } = useQuery({
         queryKey: ["schedules", year, month],
         queryFn: () => getSchedules(year, month),
     });
 
+    const handleSearch = useCallback(() => {
+        setSearchKeyword(searchInput);
+    }, [searchInput]);
+
     const filteredSchedules = useMemo(() => {
-        if (!searchInput.trim()) return schedules;
+        if (!searchKeyword.trim()) return schedules;
 
         return schedules.filter((schedule) =>
-            schedule.certificateName.toLowerCase().includes(searchInput.toLowerCase())
+            schedule.certificateName.toLowerCase().includes(searchKeyword.toLowerCase())
         );
-    }, [schedules, searchInput]);
+    }, [schedules, searchKeyword]);
 
     const events = useMemo(() => {
         return mapSchedulesToEvents(filteredSchedules);
@@ -146,14 +151,21 @@ function CalendarPage() {
                             </div>
 
                             <div className="flex w-full max-w-[360px] items-center gap-3 rounded-2xl border border-white/70 bg-white/70 px-4 py-3 shadow-[0_8px_30px_rgba(15,23,42,0.04)] backdrop-blur-xl">
-                                <Search size={18} className="text-gray-400" />
                                 <input
                                     className="w-full bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
                                     type="text"
                                     placeholder="일정 검색..."
                                     value={searchInput}
                                     onChange={(e) => setSearchInput(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            handleSearch();
+                                        }
+                                    }}
                                 />
+                                <button type="button" onClick={handleSearch} aria-label="검색">
+                                    <Search size={18} className="text-gray-400" />
+                                </button>
                             </div>
                         </div>
 
