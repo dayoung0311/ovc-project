@@ -12,4 +12,6 @@ export type LoginRequest = {
 export type User = {
     email: string;
     name: string;
+    nickname?: string;
+    profileImageUrl?: string;
 }

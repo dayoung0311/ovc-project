@@ -16,5 +16,10 @@ export const login =async(data : LoginRequest)=> {
 }
 
 export const logout = async (): Promise<void> => {
-    await apiClient.post<ApiResponse<null>>("/auth/logout");
+    try {
+        await apiClient.post<ApiResponse<null>>("/auth/logout");
+    } finally {
+        localStorage.removeItem("accessToken"); //로컬에 남아있는 accessToken 삭제
+        window.location.href="/"; //후에 랜딩페이지로 이동
+    }
 };

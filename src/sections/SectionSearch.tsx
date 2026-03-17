@@ -115,7 +115,7 @@ function SectionSearch() {
                 className="flex w-max gap-8"
                 animate={{ x: ["0%", "-50%"] }}
                 transition={{
-                  duration: 150,
+                  duration: 50,
                   ease: "linear",
                   repeat: Infinity,
                 }}

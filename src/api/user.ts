@@ -36,7 +36,7 @@ export const getMyCerts = async (): Promise<MyCertResponse[]> => {
       : [];
 
   // 백엔드 응답 키가 상황에 따라 달라질 수 있어
-  // 프론트에서 사용하는 단일 형태로 정규화한다.
+  // 프론트에서 사용하는 단일 형태로 정규화함
   return list.map((item) => {
     const cert = item as Record<string, unknown>;
     return {
@@ -74,10 +74,19 @@ export const deleteMyCert = async (certId: number): Promise<void> => {
   await apiClient.delete<ApiResponse<void>>(`/api/users/me/certs/${certId}`);
 };
 
-// 자격증 마스터(certificates) ID 기준으로 취득 자격증을 등록한다.
+// 자격증 마스터(certificates) ID 기준으로 취득 자격증을 등록
 export const addMyCert = async (
   certId: number,
   body: AddMyCertRequest,
 ): Promise<void> => {
   await apiClient.post<ApiResponse<void>>(`/api/users/me/certs/${certId}`, body);
 };
+
+//프로필 편집에서의 닉네임 변경을 위한 함수
+export const updateNickname = async(nickname:string) => {
+  const res=await apiClient.patch("/api/users/me",{
+    nickname,
+  });
+
+  return res.data;
+}
