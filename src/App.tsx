@@ -4,7 +4,6 @@ import Footer from './components/layout/Footer/Footer'
 import Router from './routes/Router'
 
 function App() {
-
   return (
     <div className={styles.container}>
       <div className={styles.header}>
