@@ -17,8 +17,12 @@ function MyPage() {
 
   const mutation = useMutation({
     mutationFn: updateNickname,
+    //수정 요청이 성공했을 경우에 실행되는 함수
     onSuccess: () => {
+      //myInfo라는 queryKey로 저장된 사용자 정보 캐시는 이제 오래된 값일 수 있으니까 무효화하라는 의미
+      //invalidateQueries= 해당 query를 stale 상태로 만들어서 다시 조회 대상이 되게 하는 것
       queryClient.invalidateQueries({ queryKey: ["myInfo"] });
+      //수정 성공했으므로 편집 모드 종료
       setIsEditing(false);
     }
   })
@@ -34,11 +38,8 @@ function MyPage() {
 
     setReady(true);
   }, [navigate]);
-  const {
-    data: user,
-    isLoading,
-    error,
-  } = useQuery({
+
+  const { data: user, isLoading, error } = useQuery({
     queryKey: ["myInfo"],
     queryFn: getMyInfo,
     retry: ready,
